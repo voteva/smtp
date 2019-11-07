@@ -6,7 +6,6 @@
 *.ko
 *.obj
 *.elf
-*/bin
 
 # Linker output
 *.ilk
@@ -54,3 +53,11 @@ dkms.conf
 
 # Idea
 .idea
+
+# Logs
+*.log
+
+# Custom
+*/bin
+*cmake-build-debug
+/client/smtp_client

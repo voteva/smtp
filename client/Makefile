@@ -1,18 +1,16 @@
 CC=gcc
 CFLAGS=-Wall -Werror -ggdb3 -D_POSIX_C_SOURCE -std=c99
-#INC=-Iinclude -Iproto -I../common/include
-INC=-Iinclude
-#LIB=-lconfig -lpcre
-LIB=
+INC=-Iinclude -Iproto -I../common/include
+LIB=-lconfig -lpcre
 
 OBJ_DIR=obj
-BIN_DIR=bin
+BIN_DIR=.
 SOURCES=$(wildcard src/*.c)
-#SOURCES_TEST=$(SOURCES) test/test.c
+SOURCES_TEST=$(SOURCES) test/test.c
 OBJECTS=$(SOURCES:.c=.o)
-#OBJECTS_TEST=$(SOURCES_TEST:.c=.o)
+OBJECTS_TEST=$(SOURCES_TEST:.c=.o)
 MAIN_OBJECTS=$(filter-out $(OBJ_DIR)/test.o, $(wildcard $(OBJ_DIR)/*.o))
-#TEST_OBJECTS=$(OBJ_DIR)/pattern.o $(OBJ_DIR)/test.o
+TEST_OBJECTS=$(OBJ_DIR)/pattern.o $(OBJ_DIR)/test.o
 TARGET=smtp_client
 
 .PHONY: all

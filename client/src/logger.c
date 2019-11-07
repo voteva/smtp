@@ -12,6 +12,7 @@ static struct
 } LOG;
 
 static const char *level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+static const char *datetime_pattern = "%Y-%m-%d %H:%M:%S";
 
 void log_set_file(FILE *file)
 {
@@ -25,7 +26,7 @@ void log_log(int level, const char *file, int line, const char *fmt, ...)
 
     va_list args;
     char buf[32];
-    buf[strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", lt)] = '\0';
+    buf[strftime(buf, sizeof(buf), datetime_pattern, lt)] = '\0';
     fprintf(LOG.file, "%s %-5s %s:%d: ", buf, level_names[level], file, line);
     va_start(args, fmt);
     vfprintf(LOG.file, fmt, args);
