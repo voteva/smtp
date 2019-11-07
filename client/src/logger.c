@@ -9,14 +9,14 @@
 static struct
 {
     FILE *file;
-} LOG;
+} LOGGER;
 
 static const char *level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 static const char *datetime_pattern = "%Y-%m-%d %H:%M:%S";
 
 void log_set_file(FILE *file)
 {
-    LOG.file = file;
+    LOGGER.file = file;
 }
 
 void log_log(int level, const char *file, int line, const char *fmt, ...)
@@ -27,10 +27,10 @@ void log_log(int level, const char *file, int line, const char *fmt, ...)
     va_list args;
     char buf[32];
     buf[strftime(buf, sizeof(buf), datetime_pattern, lt)] = '\0';
-    fprintf(LOG.file, "%s %-5s %s:%d: ", buf, level_names[level], file, line);
+    fprintf(LOGGER.file, "%s %-5s %s:%d: ", buf, level_names[level], file, line);
     va_start(args, fmt);
-    vfprintf(LOG.file, fmt, args);
+    vfprintf(LOGGER.file, fmt, args);
     va_end(args);
-    fprintf(LOG.file, "\n");
-    fflush(LOG.file);
+    fprintf(LOGGER.file, "\n");
+    fflush(LOGGER.file);
 }
