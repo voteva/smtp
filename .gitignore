@@ -61,3 +61,4 @@ dkms.conf
 */bin
 *cmake-build-debug
 /client/smtp_client
+/server/target/
