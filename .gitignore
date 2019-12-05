@@ -1,64 +1,38 @@
-# Prerequisites
-*.d
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.gradle/
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
 
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-# Idea
+### IntelliJ IDEA ###
 .idea
+*.iws
+*.iml
+*.ipr
 
-# Logs
-*.log
+### NetBeans ###
+nbproject/private/
+build/
+/out/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+/.integration-scripts
 
-# Custom
-*/bin
-*cmake-build-debug
-/client/smtp_client
-/server/target/
+*.log*
+infra/Dockerfile.made
+
+.DS_Store
+/*/target
+/log*
+/*/log
+
+files/
+old/
