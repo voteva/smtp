@@ -1,11 +1,15 @@
 package com.bmstu.nets.client;
 
-import com.bmstu.nets.client.model.Message;
-
 public class Client {
 
     public static void main(String[] args) {
-        Message message = new Message();
-        message.setData(null);
+        System.out.println("Client started");
+        try {
+            new StartupService().start();
+
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            System.out.println("Client stopped");
+        }
     }
 }
