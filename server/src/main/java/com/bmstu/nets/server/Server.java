@@ -27,19 +27,19 @@ public class Server {
     
     public void startSMTP() throws BindException {
         try {
-            LOG.info("Starting SMTP");
+            LOG.info("Starting SMTP  (▀̿̿Ĺ̯̿▀̿ ̿)");
             InetSocketAddress bindAddress = new InetSocketAddress(port);
             smtpSocket = new ServerSocket();
             smtpSocket.setReuseAddress(true);
             smtpSocket.bind(bindAddress);
-            LOG.info("Socket Opened");
+            LOG.info("Socket Opened (ーー;)");
             while(true) {
-                LOG.info("Connect me :)");
+                LOG.info("Connect me ('・ω・')");
                 Socket connectionSocket = smtpSocket.accept();
 
             }
         } catch (IOException ex) {
-            LOG.error("Failed to open socket");
+            LOG.error("Failed to open socket (｡ŏ﹏ŏ)");
             ex.printStackTrace(System.err);        
         }
     }
@@ -54,7 +54,7 @@ public class Server {
            }
            else
            {
-                   LOG.info("Default to 2525");
+                   LOG.info("Default to 2525 (︶^︶)");
            }
            Server console = new Server(bindPort);
            console.startSMTP();
