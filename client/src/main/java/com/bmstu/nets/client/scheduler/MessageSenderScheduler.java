@@ -1,5 +1,7 @@
-package com.bmstu.nets.client.handler;
+package com.bmstu.nets.client.scheduler;
 
+import com.bmstu.nets.client.service.MessageSenderService;
+import com.bmstu.nets.client.service.MessageSenderServiceImpl;
 import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.client.queue.MessageQueue;
@@ -7,33 +9,38 @@ import com.bmstu.nets.client.queue.MessageQueue;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
-public class MessageSender
+public class MessageSenderScheduler
         implements Runnable, AutoCloseable {
-    private static final Logger logger = getLogger(MessageSender.class);
+    private static final Logger logger = getLogger(MessageSenderScheduler.class);
 
     private static final long DELAY_MILLIS = 1000L;
     private volatile boolean stopped = false;
 
     private final MessageQueue messageQueue;
+    private final MessageSenderService messageSenderService;
 
-    public MessageSender() {
+    public MessageSenderScheduler() {
         this.messageQueue = MessageQueue.instance();
+        this.messageSenderService = new MessageSenderServiceImpl();
     }
 
     @Override
     public void run() {
-        logger.info("MessageSender thread started");
+        logger.info("MessageSenderScheduler thread started");
         try {
             while (!stopped) {
-                // TODO read message from queue and execute send
                 Message message = messageQueue.dequeue();
+
+                if (message != null) {
+                    messageSenderService.sendMessage(message);
+                }
 
                 sleep(DELAY_MILLIS);
             }
         } catch (InterruptedException exception) {
-            logger.error("MessageSender thread is interrupted");
+            logger.error("MessageSenderScheduler thread is interrupted");
         }
-        logger.info("MessageSender thread is stopped");
+        logger.info("MessageSenderScheduler thread is stopped");
     }
 
     @Override

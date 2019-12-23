@@ -5,7 +5,6 @@ import com.bmstu.nets.common.queue.LogQueue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmstu.nets.common.logger.LogLevel.*;
 import static com.bmstu.nets.common.logger.LogLevel.DEBUG;
 import static com.bmstu.nets.common.logger.LogLevel.ERROR;
 import static com.bmstu.nets.common.logger.LogLevel.INFO;
@@ -18,7 +17,7 @@ public class LoggerImpl
     private final LogQueue logQueue;
     private final Class clazz;
 
-    LoggerImpl(Class clazz) {
+    LoggerImpl(@Nonnull Class clazz) {
         this.loggerConfiguration = LoggerConfiguration.instance();
         this.logQueue = LogQueue.instance();
         this.clazz = clazz;
@@ -54,26 +53,31 @@ public class LoggerImpl
 
     @Override
     public boolean isErrorEnabled() {
-        return loggerConfiguration.getLevel().getOrder() <= ERROR.getOrder();
+        return loggerConfiguration.getLevel().getOrder() >= ERROR.getOrder();
     }
 
     @Override
     public boolean isWarnEnabled() {
-        return loggerConfiguration.getLevel().getOrder() <= WARN.getOrder();
+        return loggerConfiguration.getLevel().getOrder() >= WARN.getOrder();
     }
 
     @Override
     public boolean isInfoEnabled() {
-        return loggerConfiguration.getLevel().getOrder() <= INFO.getOrder();
+        return loggerConfiguration.getLevel().getOrder() >= INFO.getOrder();
     }
 
     @Override
     public boolean isDebugEnabled() {
-        return loggerConfiguration.getLevel().getOrder() <= DEBUG.getOrder();
+        return loggerConfiguration.getLevel().getOrder() >= DEBUG.getOrder();
     }
 
     @Nonnull
     private String prepareLogMessage(@Nonnull LogLevel logLevel, @Nonnull String message, @Nullable String... values) {
-        return clazz.getSimpleName() + ": " + logLevel + " " + message; // TODO
+        String messageText = clazz.getSimpleName() + ": " + logLevel + " " + message;
+        if (values != null && values.length > 0) {
+            messageText = messageText.replaceAll("\\{}", "%s");
+            return String.format(messageText, values);
+        }
+        return messageText;
     }
 }

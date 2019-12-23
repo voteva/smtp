@@ -1,7 +1,7 @@
 package com.bmstu.nets.client;
 
-import com.bmstu.nets.client.handler.MessageReader;
-import com.bmstu.nets.client.handler.MessageSender;
+import com.bmstu.nets.client.scheduler.MessageReaderScheduler;
+import com.bmstu.nets.client.scheduler.MessageSenderScheduler;
 import com.bmstu.nets.common.logger.LogWriter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -22,7 +22,7 @@ class StartupService {
 
     void start() {
         executorService.execute(new LogWriter());
-        executorService.execute(new MessageReader());
-        executorService.execute(new MessageSender());
+        executorService.execute(new MessageReaderScheduler());
+        executorService.execute(new MessageSenderScheduler());
     }
 }
