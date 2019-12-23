@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.queue;
+package com.bmstu.nets.common.queue;
 
 import javax.annotation.Nonnull;
 

@@ -1,11 +1,15 @@
-package com.bmstu.nets.client.logger;
+package com.bmstu.nets.common.logger;
 
-import com.bmstu.nets.client.queue.LogQueue;
+import com.bmstu.nets.common.queue.LogQueue;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.bmstu.nets.client.logger.LogLevel.*;
+import static com.bmstu.nets.common.logger.LogLevel.*;
+import static com.bmstu.nets.common.logger.LogLevel.DEBUG;
+import static com.bmstu.nets.common.logger.LogLevel.ERROR;
+import static com.bmstu.nets.common.logger.LogLevel.INFO;
+import static com.bmstu.nets.common.logger.LogLevel.WARN;
 
 public class LoggerImpl
         implements Logger {

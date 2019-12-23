@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.logger;
+package com.bmstu.nets.common.logger;
 
 public interface Logger {
     void error(String message, String... values);

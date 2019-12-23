@@ -1,8 +1,8 @@
-package com.bmstu.nets.client.logger;
+package com.bmstu.nets.common.logger;
 
 import lombok.Data;
 
-import static com.bmstu.nets.client.logger.LogLevel.INFO;
+import static com.bmstu.nets.common.logger.LogLevel.INFO;
 
 @Data
 public class LoggerConfiguration {

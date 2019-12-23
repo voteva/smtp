@@ -1,6 +1,6 @@
-package com.bmstu.nets.client.logger;
+package com.bmstu.nets.common.logger;
 
-import com.bmstu.nets.client.queue.LogQueue;
+import com.bmstu.nets.common.queue.LogQueue;
 
 public class LogWriter
         implements Runnable, AutoCloseable {

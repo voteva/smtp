@@ -1,6 +1,6 @@
 package com.bmstu.nets.client.statemachine;
 
-import com.bmstu.nets.client.model.MessageStatus;
+import com.bmstu.nets.common.model.MessageStatus;
 import com.google.common.collect.ImmutableTable;
 import lombok.Setter;
 

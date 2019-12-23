@@ -1,6 +1,6 @@
 package com.bmstu.nets.client.handler;
 
-import com.bmstu.nets.client.model.Message;
+import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.client.queue.MessageQueue;
 
 import static java.lang.Thread.sleep;

@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.model;
+package com.bmstu.nets.common.model;
 
 import lombok.Data;
 

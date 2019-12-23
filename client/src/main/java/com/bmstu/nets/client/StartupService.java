@@ -2,7 +2,7 @@ package com.bmstu.nets.client;
 
 import com.bmstu.nets.client.handler.MessageReader;
 import com.bmstu.nets.client.handler.MessageSender;
-import com.bmstu.nets.client.logger.LogWriter;
+import com.bmstu.nets.common.logger.LogWriter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ExecutorService;

@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.logger;
+package com.bmstu.nets.common.logger;
 
 import javax.annotation.Nonnull;
 
