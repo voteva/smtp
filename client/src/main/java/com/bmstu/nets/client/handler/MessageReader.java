@@ -1,15 +1,15 @@
 package com.bmstu.nets.client.handler;
 
-import com.bmstu.nets.common.logger.Logger;
-import com.bmstu.nets.common.logger.LoggerFactory;
-import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.client.queue.MessageQueue;
+import com.bmstu.nets.common.logger.Logger;
+import com.bmstu.nets.common.model.Message;
 
+import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
 public class MessageReader
         implements Runnable, AutoCloseable {
-    private static final Logger logger = LoggerFactory.getLogger(MessageReader.class);
+    private static final Logger logger = getLogger(MessageReader.class);
 
     private static final long DELAY_MILLIS = 1000L;
     private volatile boolean stopped = false;
@@ -22,7 +22,7 @@ public class MessageReader
 
     @Override
     public void run() {
-        System.out.println("MessageReader thread started");
+        logger.info("MessageReader thread started");
         try {
             while (!stopped) {
                 // TODO read message and add to queue
@@ -35,9 +35,9 @@ public class MessageReader
                 sleep(DELAY_MILLIS);
             }
         } catch (InterruptedException exception) {
-            System.out.println("MessageReader thread is interrupted");
+            logger.error("MessageReader thread is interrupted");
         }
-        System.out.println("MessageReader thread is stopped");
+        logger.info("MessageReader thread is stopped");
     }
 
     @Override

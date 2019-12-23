@@ -1,12 +1,16 @@
 package com.bmstu.nets.client.handler;
 
+import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.client.queue.MessageQueue;
 
+import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
 public class MessageSender
         implements Runnable, AutoCloseable {
+    private static final Logger logger = getLogger(MessageSender.class);
+
     private static final long DELAY_MILLIS = 1000L;
     private volatile boolean stopped = false;
 
@@ -18,7 +22,7 @@ public class MessageSender
 
     @Override
     public void run() {
-        System.out.println("MessageSender thread started");
+        logger.info("MessageSender thread started");
         try {
             while (!stopped) {
                 // TODO read message from queue and execute send
@@ -27,9 +31,9 @@ public class MessageSender
                 sleep(DELAY_MILLIS);
             }
         } catch (InterruptedException exception) {
-            System.out.println("MessageSender thread is interrupted");
+            logger.error("MessageSender thread is interrupted");
         }
-        System.out.println("MessageSender thread is stopped");
+        logger.info("MessageSender thread is stopped");
     }
 
     @Override
