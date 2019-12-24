@@ -5,7 +5,12 @@
  */
 package com.bmstu.nets.server;
 
+import com.bmstu.nets.common.model.Message;
+import com.bmstu.nets.common.model.MessageStatus;
 import com.bmstu.nets.server.logger.Logger;
+import com.bmstu.nets.server.msg.MessageSaver;
+import com.bmstu.nets.server.msg.Parser;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -15,6 +20,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -30,8 +36,9 @@ public class Server {
     private ServerSocketChannel ssc;
     private boolean stop = false;
     
-    private HashMap<SocketChannel, Boolean>    mode = new HashMap<SocketChannel, Boolean>();
-    private HashMap<SocketChannel, ByteBuffer> map  = new HashMap<SocketChannel, ByteBuffer>();
+    private HashMap<SocketChannel, Boolean>    mode = new HashMap<>();
+    private HashMap<SocketChannel, ByteBuffer> map  = new HashMap<>();
+    private HashMap<SelectionKey, ArrayList<Message>> messagesHash  = new HashMap<>();
 
 
     public Server(int port)
@@ -44,7 +51,7 @@ public class Server {
         stop = true;
     }
         
-    public void startSMTP() throws BindException {
+    public void startSMTP() {
         try {
             LOG.info("Starting SMTP  (▀̿̿Ĺ̯̿▀̿ ̿)");
             InetSocketAddress bindAddress = new InetSocketAddress(port);
@@ -57,11 +64,9 @@ public class Server {
             ssc.register(acpt_sel, SelectionKey.OP_ACCEPT);
             
             LOG.info("I am OK! Listen you (ーー;)");
-            Executors.newSingleThreadExecutor().submit(new Runnable() {
-            @Override
-            public void run() {
+            Executors.newSingleThreadExecutor().submit(() -> {
                 try {
-                    while (stop == false) {
+                    while (!stop) {
                         LOG.info("Connect me ('・ω・')");
                         if (acpt_sel.select() <= 0) {
                             LOG.info("Nothing happend (-_-;)");
@@ -71,9 +76,9 @@ public class Server {
                         while (iter.hasNext()) {
                             SelectionKey sk = iter.next();
                             iter.remove();
-                            if (sk.isValid() == false) {
+                            if (!sk.isValid()) {
                                 LOG.error("Error!!! Invalid key!!! (T_T)");
-                                emit("error", null, null);
+                                emit("error", null, null, null);
                                 return;
                             } else if (sk.isAcceptable()) {
                                 accept(sk);
@@ -90,11 +95,10 @@ public class Server {
                     LOG.info("Server stoped (｡ŏ﹏ŏ)");
                     ssc.socket().close();
                 } catch (Exception e) {
-                    LOG.error("Error!!! I catch exception!!! (T_T)");
+                    LOG.error("Error!!! I catch exception!!! (T_T)\n" + e.toString());
                     throw new RuntimeException(e);
                 }
-            }
-        });
+            });
         } catch (IOException ex) {
             ex.printStackTrace(System.err);        
         }
@@ -102,31 +106,33 @@ public class Server {
     
      private void accept(SelectionKey sk) throws Exception {
         ServerSocketChannel ssc = (ServerSocketChannel) sk.channel();
-
         SocketChannel sc = ssc.accept();
         sc.configureBlocking(false);
         sc.register(sk.selector(), SelectionKey.OP_READ);
-        emit("connect", null, sc);
+        emit("connect", null, sc, null);
     }
 
     private void read(SelectionKey sk) throws Exception {
         SocketChannel sc = (SocketChannel) sk.channel();
+        if (!messagesHash.containsKey(sk)) {
+            messagesHash.put(sk, new ArrayList<>());
+        }
+        ArrayList<Message> msgs = messagesHash.get(sk);
         ByteBuffer buffer = ByteBuffer.allocate(1024); // TODO: 1024 is ok?
         while (sc.read(buffer) > 0) {
-            emit("data", buffer, sc);
+            emit("data", buffer, sc, msgs);
             buffer.clear();
         }
         sk.interestOps(SelectionKey.OP_READ);
     }
 
-    public void emit(String event, ByteBuffer data, SocketChannel sc) throws Exception {
-
+    public void emit(String event, ByteBuffer data, SocketChannel sc, ArrayList<Message> msgs) throws Exception {
         if ("data".equals(event)) {
 
             if (mode.get(sc)) {
                 // data mode
                 LOG.info("now in data mode");
-                emit("mailData", data, sc);
+                emit("mailData", data, sc, msgs);
             } else {
                 // command mode
                 LOG.info("now in command mode");
@@ -136,10 +142,10 @@ public class Server {
                 }
 
                 String txt = new String(prev.array(), 0, prev.position());
-                if (txt.indexOf("\r\n") < 0) {
+                if (!txt.contains("\r\n")) {
                     return;// client not yet finished command
                 }
-                emit("command", null, sc);
+                emit("command", null, sc, msgs);
                 prev.clear();// start over for next request.
             }
         } else if ("command".equals(event)) {
@@ -154,9 +160,11 @@ public class Server {
                 resp(sc, "250 localhost Hello OLCNTI001302\r\n");
 
             } else if (cmd.startsWith("MAIL ")) {
+                msgs.add(new Message().setSender(Parser.parseSender(cmd)));
                 resp(sc, "250 2.1.0 Ok\r\n");
 
             } else if (cmd.startsWith("RCPT ")) {
+                msgs.get(msgs.size() - 1).addRecipient(Parser.parseRecipient(cmd));
                 resp(sc, "250 2.1.0 Ok\r\n");
 
             } else if (cmd.startsWith("DATA")) {
@@ -184,13 +192,16 @@ public class Server {
             LOG.info("Message : " + mail + ", endsWith'.' : " + end);
 
             if (end) {
+                msgs.get(msgs.size() - 1).setData(mail.getBytes());
+                msgs.get(msgs.size() - 1).setStatus(MessageStatus.NEW);
+                MessageSaver.save(msgs.get(msgs.size() - 1));
                 mode.put(sc, Boolean.FALSE);// back to command mode
                 prev.clear();
                 resp(sc, "250 2.0.0 Ok: got it {messageId}");
             }
         } else if ("connect".equals(event)) {
 
-            resp(sc, "220 Welcom to Jay's SMTP \r\n");
+            resp(sc, "220 Welcome to NT's SMTP \r\n");
             map.put(sc, ByteBuffer.allocate(1024));
             mode.put(sc, Boolean.FALSE);
         } else if ("end".equals(event)) {
@@ -209,8 +220,7 @@ public class Server {
         sc.write(ByteBuffer.wrap(bytes));
     }
         
-   public static void main(String args[]) throws Exception
-   {
+   public static void main(String[] args) {
            int bindPort = 2525;
            if(args.length == 1)
            {
