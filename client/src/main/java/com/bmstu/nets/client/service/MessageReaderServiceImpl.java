@@ -15,8 +15,12 @@ public class MessageReaderServiceImpl
         // TODO read message from filesystem
         return new Message()
                 .setSender("t.voteva@innopolis.ru")
-                .setRecipients(singletonList("tatianavoteva@gmailghhv.com"))
+                .setRecipients(singletonList("tatianavoteva@gmail.com"))
                 .setSubject("Hello")
-                .setData("Message data".getBytes());
+                .setData(("From: t.voteva@innopolis.ru\n" +
+                        "To: tatianavoteva@gmail.com\n" +
+                        "Subject: Hello\n" +
+                        "\n" +
+                        "Message data").getBytes());
     }
 }
