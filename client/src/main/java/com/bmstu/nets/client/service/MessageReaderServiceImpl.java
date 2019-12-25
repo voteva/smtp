@@ -42,7 +42,9 @@ public class MessageReaderServiceImpl
                         moveToCurDir(messagePath);
                     });
 
-            logger.debug("Success to read messages from '{}'", MAIL_DIR);
+            if (logger.isDebugEnabled() && !messages.isEmpty()) {
+                logger.debug("Success to read messages from '{}'. Total messages count={}", MAIL_DIR, messages.size());
+            }
             return messages;
 
         } catch (Exception e) {

@@ -37,4 +37,9 @@ public class MessageQueueMap {
         messages.add(message);
         queueMap.put(domain, messages);
     }
+
+    @Nonnull
+    public List<String> getAllDomains() {
+        return new ArrayList<>(queueMap.keySet());
+    }
 }

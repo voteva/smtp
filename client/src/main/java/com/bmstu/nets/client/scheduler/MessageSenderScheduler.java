@@ -6,6 +6,8 @@ import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.client.queue.MessageQueueMap;
 
+import java.util.List;
+
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
@@ -13,7 +15,7 @@ public class MessageSenderScheduler
         implements Runnable, AutoCloseable {
     private static final Logger logger = getLogger(MessageSenderScheduler.class);
 
-    private static final long DELAY_MILLIS = 1000L;
+    private static final long DELAY_MILLIS = 2000L;
     private volatile boolean stopped = false;
 
     private final MessageQueueMap messageQueueMap;
@@ -29,11 +31,11 @@ public class MessageSenderScheduler
         logger.info("MessageSenderScheduler thread started");
         try {
             while (!stopped) {
-//                Message message = messageQueueMap.dequeue();
-//
-//                if (message != null) {
-//                    messageSenderService.sendMessage(message);
-//                }
+                messageQueueMap.getAllDomains()
+                        .forEach(domain -> {
+                            List<Message> messages = messageQueueMap.getAllForDomain(domain);
+                            messageSenderService.sendMessages(domain, messages);
+                        });
 
                 sleep(DELAY_MILLIS);
             }

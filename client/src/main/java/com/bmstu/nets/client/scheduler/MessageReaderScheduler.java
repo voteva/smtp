@@ -13,7 +13,7 @@ public class MessageReaderScheduler
         implements Runnable, AutoCloseable {
     private static final Logger logger = getLogger(MessageReaderScheduler.class);
 
-    private static final long DELAY_MILLIS = 1000L;
+    private static final long DELAY_MILLIS = 2000L;
     private volatile boolean stopped = false;
 
     private final MessageQueueMap messageQueueMap;
