@@ -1,11 +1,12 @@
 package com.bmstu.nets.client.service;
 
-import com.bmstu.nets.common.model.Message;
+import com.bmstu.nets.client.model.Message;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public interface MessageReaderService {
 
-    @Nullable
-    Message readNextMessage();
+    @Nonnull
+    List<Message> readNextMessages();
 }

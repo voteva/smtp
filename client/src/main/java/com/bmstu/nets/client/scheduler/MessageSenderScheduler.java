@@ -3,7 +3,7 @@ package com.bmstu.nets.client.scheduler;
 import com.bmstu.nets.client.service.MessageSenderService;
 import com.bmstu.nets.client.service.MessageSenderServiceImpl;
 import com.bmstu.nets.common.logger.Logger;
-import com.bmstu.nets.common.model.Message;
+import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.client.queue.MessageQueue;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;

@@ -1,6 +1,6 @@
 package com.bmstu.nets.client.queue;
 
-import com.bmstu.nets.common.model.Message;
+import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.common.queue.QueueExchange;
 
 import javax.annotation.Nonnull;
