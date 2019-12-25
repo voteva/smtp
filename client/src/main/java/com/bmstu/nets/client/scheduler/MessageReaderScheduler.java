@@ -1,10 +1,11 @@
 package com.bmstu.nets.client.scheduler;
 
-import com.bmstu.nets.client.queue.MessageQueue;
+import com.bmstu.nets.client.queue.MessageQueueMap;
 import com.bmstu.nets.client.service.MessageReaderService;
 import com.bmstu.nets.client.service.MessageReaderServiceImpl;
 import com.bmstu.nets.common.logger.Logger;
 
+import static com.bmstu.nets.client.utils.MailUtils.getDomainName;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
@@ -15,11 +16,11 @@ public class MessageReaderScheduler
     private static final long DELAY_MILLIS = 1000L;
     private volatile boolean stopped = false;
 
-    private final MessageQueue messageQueue;
+    private final MessageQueueMap messageQueueMap;
     private final MessageReaderService messageReaderService;
 
     public MessageReaderScheduler() {
-        this.messageQueue = MessageQueue.instance();
+        this.messageQueueMap = MessageQueueMap.instance();
         this.messageReaderService = new MessageReaderServiceImpl();
     }
 
@@ -28,10 +29,10 @@ public class MessageReaderScheduler
         logger.info("MessageReaderScheduler thread started");
         try {
             while (!stopped) {
-                messageReaderService.readNextMessages()
+                messageReaderService.readNewMessages()
                         .forEach(message -> {
-                            messageQueue.enqueue(message);
-                            logger.debug("Success to add message to queue");
+                            messageQueueMap.putForDomain(getDomainName(message.getTo()), message);
+                            logger.debug("Success to add message to queue for recipient '{}'", message.getTo());
                         });
 
                 sleep(DELAY_MILLIS);

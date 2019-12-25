@@ -4,7 +4,7 @@ import com.bmstu.nets.client.service.MessageSenderService;
 import com.bmstu.nets.client.service.MessageSenderServiceImpl;
 import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.client.model.Message;
-import com.bmstu.nets.client.queue.MessageQueue;
+import com.bmstu.nets.client.queue.MessageQueueMap;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
@@ -16,11 +16,11 @@ public class MessageSenderScheduler
     private static final long DELAY_MILLIS = 1000L;
     private volatile boolean stopped = false;
 
-    private final MessageQueue messageQueue;
+    private final MessageQueueMap messageQueueMap;
     private final MessageSenderService messageSenderService;
 
     public MessageSenderScheduler() {
-        this.messageQueue = MessageQueue.instance();
+        this.messageQueueMap = MessageQueueMap.instance();
         this.messageSenderService = new MessageSenderServiceImpl();
     }
 
@@ -29,11 +29,11 @@ public class MessageSenderScheduler
         logger.info("MessageSenderScheduler thread started");
         try {
             while (!stopped) {
-                Message message = messageQueue.dequeue();
-
-                if (message != null) {
-                    messageSenderService.sendMessage(message);
-                }
+//                Message message = messageQueueMap.dequeue();
+//
+//                if (message != null) {
+//                    messageSenderService.sendMessage(message);
+//                }
 
                 sleep(DELAY_MILLIS);
             }

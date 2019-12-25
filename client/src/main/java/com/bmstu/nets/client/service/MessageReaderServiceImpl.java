@@ -31,7 +31,7 @@ public class MessageReaderServiceImpl
 
     @Nonnull
     @Override
-    public List<Message> readNextMessages() {
+    public List<Message> readNewMessages() {
         try {
             final List<Message> messages = newArrayList();
             Files

@@ -8,5 +8,5 @@ import java.util.List;
 public interface MessageReaderService {
 
     @Nonnull
-    List<Message> readNextMessages();
+    List<Message> readNewMessages();
 }
