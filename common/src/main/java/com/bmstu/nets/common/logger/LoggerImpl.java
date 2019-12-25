@@ -24,28 +24,28 @@ public class LoggerImpl
     }
 
     @Override
-    public void error(String message, String... values) {
+    public void error(String message, Object... values) {
         if (isErrorEnabled()) {
             logQueue.enqueue(prepareLogMessage(ERROR, message, values));
         }
     }
 
     @Override
-    public void warn(String message, String... values) {
+    public void warn(String message, Object... values) {
         if (isWarnEnabled()) {
             logQueue.enqueue(prepareLogMessage(WARN, message, values));
         }
     }
 
     @Override
-    public void info(String message, String... values) {
+    public void info(String message, Object... values) {
         if (isInfoEnabled()) {
             logQueue.enqueue(prepareLogMessage(INFO, message, values));
         }
     }
 
     @Override
-    public void debug(String message, String... values) {
+    public void debug(String message, Object... values) {
         if (isDebugEnabled()) {
             logQueue.enqueue(prepareLogMessage(DEBUG, message, values));
         }
@@ -72,7 +72,7 @@ public class LoggerImpl
     }
 
     @Nonnull
-    private String prepareLogMessage(@Nonnull LogLevel logLevel, @Nonnull String message, @Nullable String... values) {
+    private String prepareLogMessage(@Nonnull LogLevel logLevel, @Nonnull String message, @Nullable Object... values) {
         String messageText = clazz.getSimpleName() + ": " + logLevel + " " + message;
         if (values != null && values.length > 0) {
             messageText = messageText.replaceAll("\\{}", "%s");

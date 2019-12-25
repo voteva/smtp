@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.stream.Collectors.toList;
 
 public class MessageReaderServiceImpl
         implements MessageReaderService {
@@ -22,6 +25,9 @@ public class MessageReaderServiceImpl
     private static final String MAIL_DIR = "./Maildir"; // TODO read from config
     private static final String DIR_NEW = "/new";
     private static final String DIR_CUR = "/cur";
+
+    private static final String HEADER_X_ORIGINAL_FROM = "X-Original-From";
+    private static final String HEADER_X_ORIGINAL_TO = "X-Original-To";
 
     @Nonnull
     @Override
@@ -49,13 +55,18 @@ public class MessageReaderServiceImpl
     private List<Message> readMessages(@Nonnull Path messagePath) {
         try {
             final String messageData = new String(Files.readAllBytes(Paths.get(messagePath.toString())));
+            final Map<String, String> headers = getHeaders(messageData);
+            final String originalFrom = headers.get(HEADER_X_ORIGINAL_FROM);
+            final String[] originalToArray = headers.get(HEADER_X_ORIGINAL_TO).split(",");
 
-            // TODO
-            Message message = new Message()
-                    .setFrom("t.voteva@innopolis.ru")
-                    .setTo("tatianavoteva@gmail.com")
-                    .setData(messageData);
-            return Collections.singletonList(message);
+            return Arrays
+                    .stream(originalToArray)
+                    .map(originalTo -> new Message()
+                            .setFrom(originalFrom)
+                            .setTo(originalTo)
+                            .setData(messageData))
+                    .collect(toList());
+
         } catch (Exception e) {
             logger.warn(e.getMessage());
             return newArrayList();
@@ -66,9 +77,9 @@ public class MessageReaderServiceImpl
         final String newFileName = getOrCreateDir(MAIL_DIR + DIR_CUR) + "/" + messagePath.getFileName();
         if (messagePath.toFile().renameTo(new File(newFileName))) {
             boolean deleted = messagePath.toFile().delete();
-            logger.debug("Message '{}' deleted: {}", messagePath.toString(), String.valueOf(deleted));
+            logger.debug("Message '{}' deleted: {}", messagePath, deleted);
         } else {
-            logger.warn("Failed to rename file '{}'", messagePath.getFileName().toString());
+            logger.warn("Failed to rename file '{}'", messagePath.getFileName());
         }
     }
 
@@ -79,8 +90,22 @@ public class MessageReaderServiceImpl
             Files.createDirectories(path);
             return path.toString();
         } catch (IOException e) {
-            logger.error("Failed to create directory '{}'", path.toString());
+            logger.error("Failed to create directory '{}'", path);
             return null;
         }
+    }
+
+    @Nonnull
+    private Map<String, String> getHeaders(@Nonnull String data) {
+        final String headersStr = data.split("\n\n")[0];
+        final Map<String, String> headers = newHashMap();
+
+        Arrays.stream(headersStr.split("\n"))
+                .forEach(it -> {
+                    String[] splitHeader = it.split(":");
+                    headers.put(splitHeader[0], splitHeader[1].replaceAll(" ", ""));
+                });
+
+        return headers;
     }
 }
