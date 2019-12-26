@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.config.properties;
+package com.bmstu.nets.client.properties;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;

@@ -3,7 +3,6 @@ package com.bmstu.nets.client.utils;
 import com.bmstu.nets.common.logger.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -18,15 +17,6 @@ import static java.util.Collections.singletonList;
 
 public class MailUtils {
     private static final Logger logger = getLogger(MailUtils.class);
-
-    @Nullable
-    public static String getMxRecord(@Nonnull String mailAddress) {
-        final String domainName = getDomainName(mailAddress);
-        return getMxRecords(domainName)
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
 
     @Nonnull
     public static String getDomainName(@Nonnull String mailAddress) {

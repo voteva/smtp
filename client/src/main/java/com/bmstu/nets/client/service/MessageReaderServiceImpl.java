@@ -1,7 +1,7 @@
 package com.bmstu.nets.client.service;
 
-import com.bmstu.nets.client.config.PropertiesConfiguration;
-import com.bmstu.nets.client.config.properties.MaildirProperties;
+import com.bmstu.nets.common.config.PropertiesConfiguration;
+import com.bmstu.nets.client.properties.MaildirProperties;
 import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.common.logger.Logger;
 

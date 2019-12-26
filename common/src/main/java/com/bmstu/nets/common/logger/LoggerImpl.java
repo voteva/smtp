@@ -1,5 +1,6 @@
 package com.bmstu.nets.common.logger;
 
+import com.bmstu.nets.common.config.PropertiesConfiguration;
 import com.bmstu.nets.common.queue.LogQueue;
 
 import javax.annotation.Nonnull;
@@ -13,12 +14,12 @@ import static com.bmstu.nets.common.logger.LogLevel.WARN;
 public class LoggerImpl
         implements Logger {
 
-    private final LoggerConfiguration loggerConfiguration;
+    private final LoggerProperties properties;
     private final LogQueue logQueue;
     private final Class clazz;
 
     LoggerImpl(@Nonnull Class clazz) {
-        this.loggerConfiguration = LoggerConfiguration.instance();
+        this.properties = PropertiesConfiguration.instance().loadProperties(LoggerProperties.class);
         this.logQueue = LogQueue.instance();
         this.clazz = clazz;
     }
@@ -53,22 +54,22 @@ public class LoggerImpl
 
     @Override
     public boolean isErrorEnabled() {
-        return loggerConfiguration.getLevel().getOrder() >= ERROR.getOrder();
+        return properties.getLevel().getOrder() >= ERROR.getOrder();
     }
 
     @Override
     public boolean isWarnEnabled() {
-        return loggerConfiguration.getLevel().getOrder() >= WARN.getOrder();
+        return properties.getLevel().getOrder() >= WARN.getOrder();
     }
 
     @Override
     public boolean isInfoEnabled() {
-        return loggerConfiguration.getLevel().getOrder() >= INFO.getOrder();
+        return properties.getLevel().getOrder() >= INFO.getOrder();
     }
 
     @Override
     public boolean isDebugEnabled() {
-        return loggerConfiguration.getLevel().getOrder() >= DEBUG.getOrder();
+        return properties.getLevel().getOrder() >= DEBUG.getOrder();
     }
 
     @Nonnull

@@ -1,4 +1,4 @@
-package com.bmstu.nets.client.config;
+package com.bmstu.nets.common.config;
 
 import com.bmstu.nets.common.logger.Logger;
 import com.google.gson.Gson;
@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import org.json.simple.JSONObject;
 
 import javax.annotation.Nonnull;
+import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
@@ -16,8 +17,7 @@ public class PropertiesConfiguration {
     private static final Logger logger = getLogger(PropertiesConfiguration.class);
     private static final String PROPERTIES_PATH = "application.properties";
 
-    private final Gson gson = new GsonBuilder().create();
-
+    private final Gson gson;
     private final Properties properties;
 
     private static class PropertiesConfigurationHolder {
@@ -29,6 +29,7 @@ public class PropertiesConfiguration {
     }
 
     private PropertiesConfiguration() {
+        this.gson = new GsonBuilder().create();
         this.properties = new Properties();
         ClassLoader loader = this.getClass().getClassLoader();
         loadProperties(loader, this.properties, PROPERTIES_PATH);
@@ -47,7 +48,7 @@ public class PropertiesConfiguration {
 
     private void loadProperties(@Nonnull ClassLoader loader, @Nonnull Properties properties, @Nonnull String path) {
         try {
-            java.net.URL url = loader.getResource(path);
+            URL url = loader.getResource(path);
             if (url == null) {
                 logger.error("Could not find configuration file: {}", path);
                 return;

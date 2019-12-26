@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 
 import java.util.List;
 
-import static com.bmstu.nets.client.utils.MailUtils.getMxRecord;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
 public class MessageSenderServiceImpl
