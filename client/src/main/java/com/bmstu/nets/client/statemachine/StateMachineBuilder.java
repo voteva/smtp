@@ -1,6 +1,5 @@
 package com.bmstu.nets.client.statemachine;
 
-import com.bmstu.nets.common.model.MessageStatus;
 import com.google.common.collect.ImmutableTable;
 import lombok.Setter;
 
@@ -9,7 +8,7 @@ public class StateMachineBuilder {
     @Setter
     private StateMachine stateMachine;
 
-    private final ImmutableTable.Builder<MessageStatus, Event, Action> builder;
+    private final ImmutableTable.Builder<Event, EventStatus, Action> builder;
 
     public StateMachineBuilder() {
         builder = ImmutableTable.builder();
@@ -19,9 +18,9 @@ public class StateMachineBuilder {
         return stateMachine.setTable(builder.build());
     }
 
-    public ActionHolder when(final MessageStatus status, final Event event) {
+    public ActionHolder when(Event event, EventStatus status) {
         return action -> {
-            builder.put(status, event, action);
+            builder.put(event, status, action);
             return StateMachineBuilder.this;
         };
     }
