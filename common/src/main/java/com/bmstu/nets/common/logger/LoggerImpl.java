@@ -11,8 +11,7 @@ import static com.bmstu.nets.common.logger.LogLevel.ERROR;
 import static com.bmstu.nets.common.logger.LogLevel.INFO;
 import static com.bmstu.nets.common.logger.LogLevel.WARN;
 
-public class LoggerImpl
-        implements Logger {
+class LoggerImpl implements Logger {
 
     private final LoggerProperties properties;
     private final LogQueue logQueue;

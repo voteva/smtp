@@ -2,7 +2,7 @@ package com.bmstu.nets.common.logger;
 
 import lombok.Getter;
 
-public enum LogLevel {
+enum LogLevel {
     ERROR(0),
     WARN(1),
     INFO(3),
