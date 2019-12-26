@@ -26,7 +26,7 @@ public class MessageQueueMap {
 
     @Nonnull
     public List<Message> getAllForDomain(@Nonnull String domain) {
-        return new ArrayList<>(queueMap.get(domain));
+        return new ArrayList<>(queueMap.remove(domain));
     }
 
     public void putForDomain(@Nonnull String domain, @Nonnull Message message) {
