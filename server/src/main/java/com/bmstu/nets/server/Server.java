@@ -8,6 +8,7 @@ package com.bmstu.nets.server;
 import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.common.model.MessageStatus;
 import com.bmstu.nets.server.logger.Logger;
+import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.msg.MessageSaver;
 import com.bmstu.nets.server.msg.Parser;
 
@@ -38,7 +39,7 @@ public class Server {
     
     private HashMap<SocketChannel, Boolean>    mode = new HashMap<>();
     private HashMap<SocketChannel, ByteBuffer> map  = new HashMap<>();
-    private HashMap<SelectionKey, ArrayList<Message>> messagesHash  = new HashMap<>();
+    private HashMap<SelectionKey, ArrayList<ServerMessage>> messagesHash  = new HashMap<>();
 
 
     public Server(int port)
@@ -117,7 +118,7 @@ public class Server {
         if (!messagesHash.containsKey(sk)) {
             messagesHash.put(sk, new ArrayList<>());
         }
-        ArrayList<Message> msgs = messagesHash.get(sk);
+        ArrayList<ServerMessage> msgs = messagesHash.get(sk);
         ByteBuffer buffer = ByteBuffer.allocate(1024); // TODO: 1024 is ok?
         while (sc.read(buffer) > 0) {
             emit("data", buffer, sc, msgs);
@@ -126,7 +127,7 @@ public class Server {
         sk.interestOps(SelectionKey.OP_READ);
     }
 
-    public void emit(String event, ByteBuffer data, SocketChannel sc, ArrayList<Message> msgs) throws Exception {
+    public void emit(String event, ByteBuffer data, SocketChannel sc, ArrayList<ServerMessage> msgs) throws Exception {
         if ("data".equals(event)) {
 
             if (mode.get(sc)) {
@@ -160,7 +161,7 @@ public class Server {
                 resp(sc, "250 localhost Hello OLCNTI001302\r\n");
 
             } else if (cmd.startsWith("MAIL ")) {
-                msgs.add(new Message().setSender(Parser.parseSender(cmd)));
+                msgs.add((ServerMessage) new ServerMessage().setSender(Parser.parseSender(cmd)));
                 resp(sc, "250 2.1.0 Ok\r\n");
 
             } else if (cmd.startsWith("RCPT ")) {
@@ -172,6 +173,10 @@ public class Server {
                 mode.put(sc, Boolean.TRUE);
 
             } else if (cmd.startsWith("QUIT")) {
+                for (Message msg : msgs) {
+                    msg.setStatus(MessageStatus.NEW);
+                    MessageSaver.save(msg);
+                }
                 resp(sc, "221 {HOSTNAME} Bye !\r\n");
                 map.remove(sc);
                 mode.remove(sc);
@@ -192,8 +197,7 @@ public class Server {
             LOG.info("Message : " + mail + ", endsWith'.' : " + end);
 
             if (end) {
-                msgs.get(msgs.size() - 1).setData(mail.getBytes());
-                msgs.get(msgs.size() - 1).setStatus(MessageStatus.NEW);
+                msgs.get(msgs.size() - 1).setData(mail);
                 MessageSaver.save(msgs.get(msgs.size() - 1));
                 mode.put(sc, Boolean.FALSE);// back to command mode
                 prev.clear();

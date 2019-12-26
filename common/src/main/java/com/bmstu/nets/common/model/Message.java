@@ -23,7 +23,7 @@ public class Message {
         this.status = status;
     }
 
-    private MessageStatus status;
+    protected MessageStatus status;
     private LocalTime created_at;
 
     public Message() {
@@ -54,7 +54,7 @@ public class Message {
         }
     }
     public String getDir(){
-        return sender + "/Maildir/" + getStatusString() + "/" + created_at.toString();
+        return "./Maildir/" + getStatusString() + "/" + created_at.toString();
     }
 
     public String getSender() {
@@ -93,8 +93,11 @@ public class Message {
         return data;
     }
 
-    public Message setData(byte[] data) {
-        this.data = data;
+    public Message setData(String data) {
+        String default_header = "X-Original-From: " + this.sender + "\r\nX-Original-To: " + String.join(", ", this.recipients) + "\r\n";
+        data = default_header + data;
+        this.data = data.getBytes();
         return this;
     }
+
 }
