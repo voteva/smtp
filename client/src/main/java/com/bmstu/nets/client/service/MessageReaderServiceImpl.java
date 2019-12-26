@@ -1,5 +1,7 @@
 package com.bmstu.nets.client.service;
 
+import com.bmstu.nets.client.config.PropertiesConfiguration;
+import com.bmstu.nets.client.config.properties.MaildirProperties;
 import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.common.logger.Logger;
 
@@ -22,12 +24,15 @@ import static java.util.stream.Collectors.toList;
 public class MessageReaderServiceImpl
         implements MessageReaderService {
     private static final Logger logger = getLogger(MessageReaderServiceImpl.class);
-    private static final String MAIL_DIR = "./Maildir"; // TODO read from config
-    private static final String DIR_NEW = "/new";
-    private static final String DIR_CUR = "/cur";
 
     private static final String HEADER_X_ORIGINAL_FROM = "X-Original-From";
     private static final String HEADER_X_ORIGINAL_TO = "X-Original-To";
+
+    private final MaildirProperties properties;
+
+    public MessageReaderServiceImpl() {
+        properties = PropertiesConfiguration.instance().loadProperties(MaildirProperties.class);
+    }
 
     @Nonnull
     @Override
@@ -35,7 +40,7 @@ public class MessageReaderServiceImpl
         try {
             final List<Message> messages = newArrayList();
             Files
-                    .walk(Paths.get(MAIL_DIR + DIR_NEW), 1)
+                    .walk(Paths.get(properties.getMaildirBasePath() + properties.getMaildirPathNew()), 1)
                     .filter(Files::isRegularFile)
                     .forEach(messagePath -> {
                         messages.addAll(readMessages(messagePath));
@@ -43,7 +48,8 @@ public class MessageReaderServiceImpl
                     });
 
             if (logger.isDebugEnabled() && !messages.isEmpty()) {
-                logger.debug("Success to read messages from '{}'. Total messages count={}", MAIL_DIR, messages.size());
+                logger.debug("Success to read messages from '{}'. Total messages count={}",
+                        properties.getMaildirBasePath(), messages.size());
             }
             return messages;
 
@@ -76,7 +82,10 @@ public class MessageReaderServiceImpl
     }
 
     private void moveToCurDir(@Nonnull Path messagePath) {
-        final String newFileName = getOrCreateDir(MAIL_DIR + DIR_CUR) + "/" + messagePath.getFileName();
+        final String newFileName = getOrCreateDir(
+                properties.getMaildirBasePath() +
+                        properties.getMaildirPathCur()) + "/" + messagePath.getFileName();
+
         if (messagePath.toFile().renameTo(new File(newFileName))) {
             boolean deleted = messagePath.toFile().delete();
             logger.debug("Message '{}' deleted: {}", messagePath, deleted);
