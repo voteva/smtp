@@ -4,9 +4,13 @@ import com.bmstu.nets.common.logger.Logger;
 import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
@@ -14,28 +18,56 @@ public class SocketUtils {
     private static final Logger logger = getLogger(SocketUtils.class);
 
     @SneakyThrows(IOException.class)
-    public static int socketRead(@Nonnull BufferedReader in) {
-        String line;
-        int result = 0;
+    public static void writeToChannel(@Nonnull SelectionKey key, @Nonnull String data) {
+        ByteBuffer buffer = ByteBuffer.allocate(32000).order(ByteOrder.LITTLE_ENDIAN); // TODO
+        try {
+            WritableByteChannel channel = (WritableByteChannel) key.channel();
 
-        while ((line = in.readLine()) != null) {
-            String prefix = line.substring(0, 3);
-            logger.debug(line);
-            try {
-                result = Integer.parseInt(prefix);
-            } catch (Exception e) {
-                logger.error("Got error while hearing smtp server: {}", e.getMessage());
-                result = -1;
-            }
-            if (line.charAt(3) != '-') break;
+            data = data.endsWith("\r\n") ? data : data + "\r\n";
+
+            byte[] bytes = data.getBytes();
+            channel.write(ByteBuffer.wrap(bytes));
+
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+        } finally {
+            buffer.clear();
         }
-
-        return result;
     }
 
     @SneakyThrows(IOException.class)
-    public static void socketWrite(@Nonnull BufferedWriter wr, @Nonnull String text) {
-        wr.write(text + "\r\n");
-        wr.flush();
+    public static int readFromChannel(@Nonnull SelectionKey key) {
+        ByteBuffer buffer = ByteBuffer.allocate(32000).order(ByteOrder.LITTLE_ENDIAN); // TODO
+        try {
+            ReadableByteChannel channel = (ReadableByteChannel) key.channel();
+
+            int result = channel.read(buffer);
+            if (result <= 0) {
+                return -1;
+            }
+
+            buffer.flip();
+
+            final String response = new String(buffer.array(), StandardCharsets.US_ASCII);
+            logger.debug(response);
+
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+            key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+
+            return getResponseCode(response);
+
+        } finally {
+            buffer.clear();
+        }
+    }
+
+    private static int getResponseCode(@Nonnull String response) {
+        try {
+            String prefix = response.substring(0, 3);
+            return Integer.parseInt(prefix);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return -1;
+        }
     }
 }

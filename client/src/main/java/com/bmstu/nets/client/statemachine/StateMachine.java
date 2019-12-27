@@ -4,14 +4,14 @@ import com.google.common.collect.Table;
 
 public class StateMachine {
 
-    private Table<Event, EventStatus, Action> table;
+    private Table<Event, Mode, Action> table;
 
-    public StateMachine setTable(Table<Event, EventStatus, Action> table) {
+    public StateMachine setTable(Table<Event, Mode, Action> table) {
         this.table = table;
         return this;
     }
 
-    public void raise(Event event, EventStatus status, StateMachineContextHolder contextHolder) {
+    public void raise(Event event, Mode status, StateMachineContextHolder contextHolder) {
         new StateMachineContextImpl(contextHolder).raise(event, status);
     }
 
@@ -29,11 +29,9 @@ public class StateMachine {
         }
 
         @Override
-        public void raise(Event event, EventStatus status) {
-//            scheduler.schedule(() -> {
-            final Action action = table.get(event, status);
+        public void raise(Event event, Mode mode) {
+            final Action action = table.get(event, mode);
             action.execute(createContext(contextHolder));
-//            }, DateUtils.addSeconds(new Date(), 1));
         }
 
         @Override

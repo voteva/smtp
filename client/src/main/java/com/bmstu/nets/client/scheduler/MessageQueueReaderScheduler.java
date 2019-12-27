@@ -3,24 +3,16 @@ package com.bmstu.nets.client.scheduler;
 import com.bmstu.nets.client.ChannelsContext;
 import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.client.queue.MessageQueueMap;
-import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.client.statemachine.StateMachine;
+import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.client.statemachine.StateMachineHolder;
 import com.bmstu.nets.common.logger.Logger;
-import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.*;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static com.bmstu.nets.client.statemachine.Event.INIT;
-import static com.bmstu.nets.client.statemachine.EventStatus.SUCCESS;
+import static com.bmstu.nets.client.statemachine.Event.CONNECT;
+import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.MailUtils.getMxRecords;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
@@ -42,7 +34,6 @@ public class MessageQueueReaderScheduler
         this.stateMachine = StateMachineHolder.instance().getStateMachine();
     }
 
-    @SneakyThrows
     @Override
     public void run() {
         logger.info("MessageSenderScheduler thread started");
@@ -50,7 +41,9 @@ public class MessageQueueReaderScheduler
             while (!stopped) {
                 messageQueueMap.getAllDomains()
                         .forEach(domain -> {
-                            List<Message> messages = messageQueueMap.getAllForDomain(domain);
+                            final List<Message> messages = messageQueueMap.getAllForDomain(domain);
+
+                            logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
                             sendMessages(domain, messages);
                         });
 
@@ -74,113 +67,10 @@ public class MessageQueueReaderScheduler
         }
         final StateMachineContextHolder contextHolder = new StateMachineContextHolder()
                 .setSelector(channelsContext.getSelector())
+                .setNextEvent(CONNECT)
                 .setMxRecord(mxRecords.get(0))
                 .setMessage(messages.get(0));
 
-        stateMachine.raise(INIT, SUCCESS, contextHolder);
-    }
-
-    public void main(String[] args) throws IOException, InterruptedException {
-        ByteBuffer buffer = ByteBuffer.allocate(32000).order(ByteOrder.LITTLE_ENDIAN);
-
-        Selector selector = Selector.open();
-        SocketChannel channel = SocketChannel.open();
-        channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_CONNECT);
-        channel.connect(new InetSocketAddress("127.0.0.1", 5555));
-
-        String message = "Hello,Disconnect !";
-        boolean exit = false;
-        int totalKey = 0;
-        Iterator<SelectionKey> iter;
-        SelectionKey key;
-
-        for (; ; ) {
-            totalKey = selector.select();
-
-            if (exit) {
-                selector.close();
-                return;
-            }
-
-            if (totalKey > 0) {
-                iter = selector.selectedKeys().iterator();
-
-                while (iter.hasNext()) {
-                    key = iter.next();
-                    iter.remove();
-
-                    if (key.isValid()) {
-                        if (key.isAcceptable()) {
-                            //ignore
-                        } else if (key.isConnectable()) {
-                            SocketChannel sock = (SocketChannel) key.channel();
-                            sock.finishConnect();
-
-                            if (sock.isConnected()) {
-                                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-                            }
-
-                            continue;
-                        }
-
-                        if (key.isReadable()) {
-                            System.out.println("Интерес на чтение");
-
-                            ReadableByteChannel rc = (ReadableByteChannel) key.channel();
-
-                            int result = rc.read(buffer);
-
-                            if (result > 0) {
-                                System.out.println("Читаем !");
-
-                                buffer.flip();
-
-                                StringBuilder builder = new StringBuilder();
-
-                                while (buffer.hasRemaining()) {
-                                    builder.append(buffer.getChar());
-                                }
-
-                                System.out.println(builder);
-
-                                System.out.println("Закрываем соеденение!");
-                                key.channel().close();
-                                key.cancel();
-                                selector.close();
-                                return;
-                            } else {
-                                System.out.println("Клиент принудительно закрыл соединение! result <= 0");
-
-                                key.channel().close();
-                                key.cancel();
-                            }
-                        }
-
-                        if (key.isWritable()) {
-                            try {
-                                TimeUnit.SECONDS.sleep(3);
-                                System.out.println("Пишем...!");
-                                WritableByteChannel wc = (WritableByteChannel) key.channel();
-
-                                for (int i = 0; i < message.length(); i++) {
-                                    buffer.putChar(message.charAt(i));
-                                }
-
-                                buffer.flip();
-
-                                wc.write(buffer);
-                                key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-                                System.out.println("Закончили писать !");
-                                key.interestOps(key.interestOps() | SelectionKey.OP_READ);
-                            } finally {
-                                System.out.println("Почистим буффер !");
-                                buffer.clear();
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        stateMachine.raise(CONNECT, ANY, contextHolder);
     }
 }

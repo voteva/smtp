@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableTable;
 
 public class StateMachineBuilder {
 
-    private final ImmutableTable.Builder<Event, EventStatus, Action> builder;
+    private final ImmutableTable.Builder<Event, Mode, Action> builder;
 
     public StateMachineBuilder() {
         builder = ImmutableTable.builder();
@@ -15,7 +15,7 @@ public class StateMachineBuilder {
         return stateMachine.setTable(builder.build());
     }
 
-    public ActionHolder when(Event event, EventStatus status) {
+    public ActionHolder when(Event event, Mode status) {
         return action -> {
             builder.put(event, status, action);
             return StateMachineBuilder.this;

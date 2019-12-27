@@ -5,7 +5,9 @@ import lombok.Getter;
 
 import static com.bmstu.nets.client.statemachine.Event.*;
 import static com.bmstu.nets.client.statemachine.Event.QUIT;
-import static com.bmstu.nets.client.statemachine.EventStatus.SUCCESS;
+import static com.bmstu.nets.client.statemachine.Mode.ANY;
+import static com.bmstu.nets.client.statemachine.Mode.READ;
+import static com.bmstu.nets.client.statemachine.Mode.WRITE;
 
 public class StateMachineHolder {
     @Getter
@@ -18,12 +20,28 @@ public class StateMachineHolder {
     private StateMachineHolder() {
         final ActionFactory actionFactory = new ActionFactory();
         stateMachine = new StateMachineBuilder()
-                .when(INIT, SUCCESS).act(actionFactory.getAction(INIT))
-                .when(HELO, SUCCESS).act(actionFactory.getAction(HELO))
-                .when(MAIL_FROM, SUCCESS).act(actionFactory.getAction(MAIL_FROM))
-                .when(RCPT_TO, SUCCESS).act(actionFactory.getAction(RCPT_TO))
-                .when(DATA, SUCCESS).act(actionFactory.getAction(DATA))
-                .when(QUIT, SUCCESS).act(actionFactory.getAction(QUIT))
+                .when(CONNECT, ANY).act(actionFactory.getAction(CONNECT, ANY))
+                .when(CONNECT, READ).act(actionFactory.getAction(CONNECT, READ))
+
+                .when(HELO, WRITE).act(actionFactory.getAction(HELO, WRITE))
+                .when(HELO, READ).act(actionFactory.getAction(HELO, READ))
+
+                .when(MAIL_FROM, WRITE).act(actionFactory.getAction(MAIL_FROM, WRITE))
+                .when(MAIL_FROM, READ).act(actionFactory.getAction(MAIL_FROM, READ))
+
+                .when(RCPT_TO, WRITE).act(actionFactory.getAction(RCPT_TO, WRITE))
+                .when(RCPT_TO, READ).act(actionFactory.getAction(RCPT_TO, READ))
+
+                .when(DATA_REQUEST, WRITE).act(actionFactory.getAction(DATA_REQUEST, WRITE))
+                .when(DATA_REQUEST, READ).act(actionFactory.getAction(DATA_REQUEST, READ))
+
+                .when(DATA, WRITE).act(actionFactory.getAction(DATA, WRITE))
+                .when(DATA, READ).act(actionFactory.getAction(DATA, READ))
+
+                .when(QUIT, WRITE).act(actionFactory.getAction(QUIT, WRITE))
+                .when(QUIT, READ).act(actionFactory.getAction(QUIT, READ))
+
+                .when(ERROR, ANY).act(actionFactory.getAction(ERROR, ANY))
                 .build();
     }
 
