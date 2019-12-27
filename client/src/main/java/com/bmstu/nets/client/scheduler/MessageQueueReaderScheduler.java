@@ -1,8 +1,9 @@
 package com.bmstu.nets.client.scheduler;
 
+import com.bmstu.nets.client.ChannelsContext;
 import com.bmstu.nets.client.model.Message;
 import com.bmstu.nets.client.queue.MessageQueueMap;
-import com.bmstu.nets.client.statemachine.ContextHolder;
+import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.client.statemachine.StateMachine;
 import com.bmstu.nets.client.statemachine.StateMachineHolder;
 import com.bmstu.nets.common.logger.Logger;
@@ -32,10 +33,12 @@ public class MessageQueueReaderScheduler
     private volatile boolean stopped = false;
 
     private final MessageQueueMap messageQueueMap;
+    private final ChannelsContext channelsContext;
     private final StateMachine stateMachine;
 
     public MessageQueueReaderScheduler() {
         this.messageQueueMap = MessageQueueMap.instance();
+        this.channelsContext = ChannelsContext.instance();
         this.stateMachine = StateMachineHolder.instance().getStateMachine();
     }
 
@@ -69,7 +72,8 @@ public class MessageQueueReaderScheduler
         if (mxRecords.isEmpty()) {
             logger.warn("No MX records found for domain '{}'", domain);
         }
-        final ContextHolder contextHolder = new ContextHolder()
+        final StateMachineContextHolder contextHolder = new StateMachineContextHolder()
+                .setSelector(channelsContext.getSelector())
                 .setMxRecord(mxRecords.get(0))
                 .setMessage(messages.get(0));
 

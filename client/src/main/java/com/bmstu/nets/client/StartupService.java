@@ -18,13 +18,13 @@ class StartupService {
                 .setNameFormat("Service-%d")
                 .setDaemon(true)
                 .build();
-        this.executorService = Executors.newFixedThreadPool(3, threadFactory);
+        this.executorService = Executors.newFixedThreadPool(4, threadFactory);
     }
 
     void start() {
         executorService.execute(new LogWriter());
         executorService.execute(new MessageSender());
-        executorService.execute(new MessageFileReaderScheduler());
         executorService.execute(new MessageQueueReaderScheduler());
+        executorService.execute(new MessageFileReaderScheduler());
     }
 }

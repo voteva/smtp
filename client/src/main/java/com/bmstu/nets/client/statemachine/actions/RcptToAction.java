@@ -1,7 +1,7 @@
 package com.bmstu.nets.client.statemachine.actions;
 
 import com.bmstu.nets.client.statemachine.Action;
-import com.bmstu.nets.client.statemachine.ContextHolder;
+import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.common.logger.Logger;
 
@@ -17,7 +17,7 @@ public class RcptToAction
 
     @Override
     public void execute(StateMachineContext context) {
-        final ContextHolder contextHolder = context.getContextHolder();
+        final StateMachineContextHolder contextHolder = context.getContextHolder();
 
         socketWrite(contextHolder.getSocketWriter(), "RCPT TO: " + contextHolder.getMessage().getTo());
         int responseStatus = socketRead(contextHolder.getSocketReader());

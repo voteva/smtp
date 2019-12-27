@@ -11,20 +11,20 @@ public class StateMachine {
         return this;
     }
 
-    public void raise(Event event, EventStatus status, ContextHolder contextHolder) {
+    public void raise(Event event, EventStatus status, StateMachineContextHolder contextHolder) {
         new StateMachineContextImpl(contextHolder).raise(event, status);
     }
 
-    private StateMachineContextImpl createContext(ContextHolder contextHolder) {
+    private StateMachineContextImpl createContext(StateMachineContextHolder contextHolder) {
         return new StateMachineContextImpl(contextHolder);
     }
 
     private class StateMachineContextImpl
             implements StateMachineContext {
 
-        private final ContextHolder contextHolder;
+        private final StateMachineContextHolder contextHolder;
 
-        private StateMachineContextImpl(ContextHolder contextHolder) {
+        private StateMachineContextImpl(StateMachineContextHolder contextHolder) {
             this.contextHolder = contextHolder;
         }
 
@@ -37,7 +37,7 @@ public class StateMachine {
         }
 
         @Override
-        public ContextHolder getContextHolder() {
+        public StateMachineContextHolder getContextHolder() {
             return contextHolder;
         }
     }

@@ -1,7 +1,7 @@
 package com.bmstu.nets.client.statemachine.actions;
 
 import com.bmstu.nets.client.statemachine.Action;
-import com.bmstu.nets.client.statemachine.ContextHolder;
+import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.common.logger.Logger;
 
@@ -9,7 +9,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 
 import static com.bmstu.nets.client.statemachine.Event.HELO;
 import static com.bmstu.nets.client.statemachine.EventStatus.SUCCESS;
@@ -25,7 +28,14 @@ class InitAction
     @Override
     public void execute(StateMachineContext context) {
         try {
-            final ContextHolder contextHolder = context.getContextHolder();
+            final StateMachineContextHolder contextHolder = context.getContextHolder();
+
+            //----------- NEW ------------
+            SocketChannel channel = SocketChannel.open();
+            channel.configureBlocking(false);
+            channel.connect(new InetSocketAddress(contextHolder.getMxRecord(), DEFAULT_SOCKET_PORT));
+            channel.register(contextHolder.getSelector(), SelectionKey.OP_CONNECT);
+            //------------------------------
 
             Socket socket = new Socket(contextHolder.getMxRecord(), DEFAULT_SOCKET_PORT);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -41,7 +51,7 @@ class InitAction
                 return;
             }
 
-            context.raise(HELO, SUCCESS);
+            //context.raise(HELO, SUCCESS);
 
         } catch (Exception e) {
             logger.error(e.getMessage());
