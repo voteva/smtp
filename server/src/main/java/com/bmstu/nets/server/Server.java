@@ -5,25 +5,19 @@
  */
 package com.bmstu.nets.server;
 
-import com.bmstu.nets.common.model.Message;
-import com.bmstu.nets.common.model.MessageStatus;
 import com.bmstu.nets.server.logger.Logger;
 import com.bmstu.nets.server.model.ServerMessage;
-import com.bmstu.nets.server.msg.MessageSaver;
-import com.bmstu.nets.server.msg.Parser;
 import com.bmstu.nets.server.processor.BaseProcessor;
 import com.bmstu.nets.server.processor.ConnectProcessor;
 import com.bmstu.nets.server.processor.EndProcessor;
 
 import java.io.IOException;
-import java.net.*;
-
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -100,7 +94,8 @@ public class Server {
                     ssc.socket().close();
                 } catch (Exception e) {
                     LOG.error("Error!!! I catch exception!!! (T_T)\n" + e.toString());
-                    throw new RuntimeException(e);
+                    notifyAllAboutError(acpt_sel);
+                    e.printStackTrace();
                 }
             });
         } catch (IOException ex) {
@@ -137,6 +132,26 @@ public class Server {
     private void error(SelectionKey sk) throws Exception {
         SocketChannel sc = (SocketChannel) sk.channel();
         EndProcessor.process(sc);
+    }
+
+
+    private void notifyAllAboutError(Selector acpt_sel) {
+        for (SelectionKey sk : acpt_sel.keys()) {
+            SocketChannel sc = (SocketChannel) sk.channel();
+            try {
+                EndProcessor.process(sc);
+//                sc.close();
+            } catch (IOException ex) {
+                LOG.error("Error!!! I catch exception while SocketChannel notify and close!!! (T_T)\n" + ex.toString());
+                ex.printStackTrace();
+            }
+        }
+        try {
+            ssc.socket().close();
+        } catch (IOException ex) {
+            LOG.error("Error!!! I catch exception while ServerSocketChannel close!!! (T_T)\n" + ex.toString());
+            ex.printStackTrace();
+        }
     }
 
    public static void main(String[] args) {
