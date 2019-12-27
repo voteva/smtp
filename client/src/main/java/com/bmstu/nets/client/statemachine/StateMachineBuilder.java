@@ -1,12 +1,8 @@
 package com.bmstu.nets.client.statemachine;
 
 import com.google.common.collect.ImmutableTable;
-import lombok.Setter;
 
 public class StateMachineBuilder {
-
-    @Setter
-    private StateMachine stateMachine;
 
     private final ImmutableTable.Builder<Event, EventStatus, Action> builder;
 
@@ -15,6 +11,7 @@ public class StateMachineBuilder {
     }
 
     public StateMachine build() {
+        final StateMachine stateMachine = new StateMachine();
         return stateMachine.setTable(builder.build());
     }
 

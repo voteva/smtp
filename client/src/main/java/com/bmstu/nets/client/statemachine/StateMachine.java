@@ -1,10 +1,6 @@
 package com.bmstu.nets.client.statemachine;
 
-import com.bmstu.nets.client.model.Message;
 import com.google.common.collect.Table;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 
 public class StateMachine {
 
@@ -15,49 +11,34 @@ public class StateMachine {
         return this;
     }
 
-    public void raise(Event event, EventStatus status, StateMachineContext context) {
-        new StateMachineContextImpl(context).raise(event, status);
+    public void raise(Event event, EventStatus status, ContextHolder contextHolder) {
+        new StateMachineContextImpl(contextHolder).raise(event, status);
     }
 
-    private StateMachineContextImpl createContext(StateMachineContext context) {
-        return new StateMachineContextImpl(context);
+    private StateMachineContextImpl createContext(ContextHolder contextHolder) {
+        return new StateMachineContextImpl(contextHolder);
     }
 
     private class StateMachineContextImpl
             implements StateMachineContext {
 
-        private final StateMachineContext context;
+        private final ContextHolder contextHolder;
 
-        private StateMachineContextImpl(StateMachineContext context) {
-            this.context = context;
+        private StateMachineContextImpl(ContextHolder contextHolder) {
+            this.contextHolder = contextHolder;
         }
 
         @Override
         public void raise(Event event, EventStatus status) {
 //            scheduler.schedule(() -> {
             final Action action = table.get(event, status);
-            action.execute(createContext(context));
+            action.execute(createContext(contextHolder));
 //            }, DateUtils.addSeconds(new Date(), 1));
         }
 
         @Override
-        public String getMxRecord() {
-            return context.getMxRecord();
-        }
-
-        @Override
-        public Message getMessage() {
-            return context.getMessage();
-        }
-
-        @Override
-        public BufferedReader getSocketReader() {
-            return context.getSocketReader();
-        }
-
-        @Override
-        public BufferedWriter getSocketWriter() {
-            return context.getSocketWriter();
+        public ContextHolder getContextHolder() {
+            return contextHolder;
         }
     }
 }

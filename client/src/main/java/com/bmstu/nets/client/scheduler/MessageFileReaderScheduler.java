@@ -9,9 +9,9 @@ import static com.bmstu.nets.client.utils.MailUtils.getDomainName;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static java.lang.Thread.sleep;
 
-public class MessageReaderScheduler
+public class MessageFileReaderScheduler
         implements Runnable, AutoCloseable {
-    private static final Logger logger = getLogger(MessageReaderScheduler.class);
+    private static final Logger logger = getLogger(MessageFileReaderScheduler.class);
 
     private static final long DELAY_MILLIS = 2000L;
     private volatile boolean stopped = false;
@@ -19,7 +19,7 @@ public class MessageReaderScheduler
     private final MessageQueueMap messageQueueMap;
     private final MessageReaderService messageReaderService;
 
-    public MessageReaderScheduler() {
+    public MessageFileReaderScheduler() {
         this.messageQueueMap = MessageQueueMap.instance();
         this.messageReaderService = new MessageReaderServiceImpl();
     }
