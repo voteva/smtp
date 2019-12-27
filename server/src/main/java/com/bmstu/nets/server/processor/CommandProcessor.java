@@ -30,6 +30,9 @@ public class CommandProcessor extends BaseProcessor{
             msgs.clear();
             resp(sc, "250 2.0.0 Ok\r\n");
 
+        } else if (cmd.startsWith("VRFY")) {
+            resp(sc, "550 5.1.1 All recipients address rejected: User unknown in local recipient table\r\n");
+
         } else if (cmd.startsWith("DATA")) {
             resp(sc, "354 Terminate with line containing only '.' \r\n");
             mailDataMode.put(sc, Boolean.TRUE);
@@ -42,6 +45,7 @@ public class CommandProcessor extends BaseProcessor{
             map.remove(sc);
             mailDataMode.remove(sc);
             return false;
+
         } else {
             resp(sc, "502 5.5.2 Error: command not recognized\r\n");
             LOG.info("Warning!!! Unknown command : " + cmd);
