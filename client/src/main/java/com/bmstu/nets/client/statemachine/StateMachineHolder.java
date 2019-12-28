@@ -41,7 +41,7 @@ public class StateMachineHolder {
                 .when(QUIT, WRITE).act(actionFactory.getAction(QUIT, WRITE))
                 .when(QUIT, READ).act(actionFactory.getAction(QUIT, READ))
 
-                .when(FINAL, ANY).act(actionFactory.getAction(FINAL, ANY))
+                .when(FINALIZE, ANY).act(actionFactory.getAction(FINALIZE, ANY))
                 .build();
     }
 

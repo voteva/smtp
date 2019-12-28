@@ -6,7 +6,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
-import static com.bmstu.nets.client.statemachine.Event.FINAL;
+import static com.bmstu.nets.client.statemachine.Event.FINALIZE;
 import static com.bmstu.nets.client.utils.SocketUtils.writeToChannel;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
@@ -27,7 +27,7 @@ class HeloWriteAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(FINAL, Mode.ANY);
+            context.raise(FINALIZE, Mode.ANY);
         }
     }
 }

@@ -5,7 +5,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
-import static com.bmstu.nets.client.statemachine.Event.FINAL;
+import static com.bmstu.nets.client.statemachine.Event.FINALIZE;
 import static com.bmstu.nets.client.statemachine.Event.MAIL_FROM;
 import static com.bmstu.nets.client.statemachine.Event.QUIT;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
@@ -28,7 +28,7 @@ public class DataReadAction
             if (status != 250) {
                 logger.error("Data content rejected for '{}', status {}",
                         contextHolder.getMxRecord(), status);
-                context.raise(FINAL, ANY);
+                context.raise(FINALIZE, ANY);
                 return;
             }
 
@@ -42,7 +42,7 @@ public class DataReadAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(FINAL, ANY);
+            context.raise(FINALIZE, ANY);
         }
     }
 }

@@ -42,11 +42,16 @@ public class MessageQueueReaderScheduler
             while (!stopped) {
                 messageQueueMap.getAllDomains()
                         .forEach(domain -> {
-                            final List<Message> messages = messageQueueMap.getAllForDomain(domain);
+                            if (channelsContext.isChannelReady(domain)) {
 
-                            if (!messages.isEmpty()) {
-                                logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
-                                sendMessages(domain, messages);
+                                final List<Message> messages = messageQueueMap.getAllForDomain(domain);
+
+                                if (!messages.isEmpty()) {
+                                    logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
+
+                                    channelsContext.setChannelNotReady(domain);
+                                    sendMessages(domain, messages);
+                                }
                             }
                         });
 
@@ -73,6 +78,7 @@ public class MessageQueueReaderScheduler
         final StateMachineContextHolder contextHolder = new StateMachineContextHolder()
                 .setSelector(channelsContext.getSelector())
                 .setNextEvent(CONNECT)
+                .setDomain(domain)
                 .setMxRecord(mxRecords.get(0))
                 .setMessages(new LinkedList<>(messages));
 

@@ -8,5 +8,5 @@ public enum Event {
     DATA_REQUEST,
     DATA,
     QUIT,
-    FINAL
+    FINALIZE
 }

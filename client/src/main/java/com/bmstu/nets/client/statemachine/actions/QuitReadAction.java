@@ -5,7 +5,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
-import static com.bmstu.nets.client.statemachine.Event.FINAL;
+import static com.bmstu.nets.client.statemachine.Event.FINALIZE;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.SocketUtils.readFromChannel;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
@@ -26,17 +26,17 @@ public class QuitReadAction
             if (status != 221) {
                 logger.error("Failed to QUIT  from '{}', status {}",
                         contextHolder.getMxRecord(), status);
-                context.raise(FINAL, ANY);
+                context.raise(FINALIZE, ANY);
                 return;
             }
 
-            logger.info("SUCCESS TO SEND EMAIL");
+            logger.info("SUCCESS TO SEND EMAILS to '{}'", contextHolder.getMxRecord());
 
-            contextHolder.getSelectionKey().cancel();
+            context.raise(FINALIZE, ANY);
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(FINAL, ANY);
+            context.raise(FINALIZE, ANY);
         }
     }
 }

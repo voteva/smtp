@@ -6,7 +6,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
 import static com.bmstu.nets.client.statemachine.Event.DATA;
-import static com.bmstu.nets.client.statemachine.Event.FINAL;
+import static com.bmstu.nets.client.statemachine.Event.FINALIZE;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.SocketUtils.readFromChannel;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
@@ -27,7 +27,7 @@ public class DataRequestReadAction
             if (status != 354) {
                 logger.error("Failed to say DATA to '{}', status {}",
                         contextHolder.getMxRecord(), status);
-                context.raise(FINAL, ANY);
+                context.raise(FINALIZE, ANY);
                 return;
             }
 
@@ -35,7 +35,7 @@ public class DataRequestReadAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(FINAL, ANY);
+            context.raise(FINALIZE, ANY);
         }
     }
 }
