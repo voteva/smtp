@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelsContext {
 
     private final Selector selector;
-    private final Map<String, SocketChannel> mxSocketChannelMap;
+    private final Map<String, SocketChannel> socketChannelMap;
 
     private static final class ChannelsContextHolder {
         static final ChannelsContext INSTANCE = new ChannelsContext();
@@ -22,7 +22,7 @@ public class ChannelsContext {
     @SneakyThrows(IOException.class)
     private ChannelsContext() {
         this.selector = Selector.open();
-        this.mxSocketChannelMap = new ConcurrentHashMap<>();
+        this.socketChannelMap = new ConcurrentHashMap<>();
     }
 
     public static ChannelsContext instance() {

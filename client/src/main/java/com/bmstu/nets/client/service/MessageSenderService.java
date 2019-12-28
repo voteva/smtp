@@ -80,6 +80,7 @@ public class MessageSenderService
 
         } catch (Exception e) {
             logger.error("Failed to perform connection. Reason: {}", e.getMessage());
+            key.cancel();
         }
     }
 
