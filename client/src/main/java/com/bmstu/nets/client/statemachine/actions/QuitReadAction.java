@@ -5,7 +5,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
-import static com.bmstu.nets.client.statemachine.Event.ERROR;
+import static com.bmstu.nets.client.statemachine.Event.FINAL;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.SocketUtils.readFromChannel;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
@@ -26,7 +26,7 @@ public class QuitReadAction
             if (status != 221) {
                 logger.error("Failed to QUIT  from '{}', status {}",
                         contextHolder.getMxRecord(), status);
-                context.raise(ERROR, ANY);
+                context.raise(FINAL, ANY);
                 return;
             }
 
@@ -36,7 +36,7 @@ public class QuitReadAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(ERROR, ANY);
+            context.raise(FINAL, ANY);
         }
     }
 }

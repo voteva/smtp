@@ -22,7 +22,7 @@ public class ActionFactory {
     private final DataReadAction dataReadAction;
     private final QuitWriteAction quitWriteAction;
     private final QuitReadAction quitReadAction;
-    private final ErrorAction errorAction;
+    private final FinalAction finalAction;
 
     public ActionFactory() {
         connectAction = new ConnectAction();
@@ -39,7 +39,7 @@ public class ActionFactory {
         dataReadAction = new DataReadAction();
         quitWriteAction = new QuitWriteAction();
         quitReadAction = new QuitReadAction();
-        errorAction = new ErrorAction();
+        finalAction = new FinalAction();
     }
 
     public Action getAction(@Nonnull Event event, @Nonnull Mode mode) {
@@ -59,7 +59,7 @@ public class ActionFactory {
             case QUIT:
                 return mode == Mode.READ ? quitReadAction : quitWriteAction;
             default:
-                return errorAction;
+                return finalAction;
         }
     }
 }

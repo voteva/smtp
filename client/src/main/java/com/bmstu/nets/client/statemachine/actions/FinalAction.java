@@ -4,7 +4,7 @@ import com.bmstu.nets.client.statemachine.Action;
 import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 
-public class ErrorAction
+public class FinalAction
         implements Action {
 
     @Override

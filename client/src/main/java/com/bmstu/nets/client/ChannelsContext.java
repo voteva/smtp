@@ -1,12 +1,11 @@
 package com.bmstu.nets.client;
 
-import com.bmstu.nets.client.statemachine.Event;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,9 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelsContext {
 
     private final Selector selector;
-    private final Map<SelectionKey, Event> selectionKeyEvent;
-
-    // TODO add Map<MX, SocketChannel>
+    private final Map<String, SocketChannel> mxSocketChannelMap;
 
     private static final class ChannelsContextHolder {
         static final ChannelsContext INSTANCE = new ChannelsContext();
@@ -25,7 +22,7 @@ public class ChannelsContext {
     @SneakyThrows(IOException.class)
     private ChannelsContext() {
         this.selector = Selector.open();
-        this.selectionKeyEvent = new ConcurrentHashMap<>();
+        this.mxSocketChannelMap = new ConcurrentHashMap<>();
     }
 
     public static ChannelsContext instance() {

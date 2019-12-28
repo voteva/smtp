@@ -5,7 +5,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
-import static com.bmstu.nets.client.statemachine.Event.ERROR;
+import static com.bmstu.nets.client.statemachine.Event.FINAL;
 import static com.bmstu.nets.client.statemachine.Event.HELO;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.SocketUtils.readFromChannel;
@@ -27,7 +27,7 @@ class ConnectReadAction
             if (status != 220) {
                 logger.error("Failed to connect to MX server '{}', status '{}'",
                         contextHolder.getMxRecord(), status);
-                context.raise(ERROR, ANY);
+                context.raise(FINAL, ANY);
                 return;
             }
 
@@ -35,7 +35,7 @@ class ConnectReadAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(ERROR, ANY);
+            context.raise(FINAL, ANY);
         }
     }
 }

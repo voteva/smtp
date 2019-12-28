@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import static com.bmstu.nets.client.statemachine.Event.ERROR;
+import static com.bmstu.nets.client.statemachine.Event.FINAL;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
 class ConnectAction
@@ -37,7 +37,7 @@ class ConnectAction
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            context.raise(ERROR, Mode.ANY);
+            context.raise(FINAL, Mode.ANY);
         }
     }
 }

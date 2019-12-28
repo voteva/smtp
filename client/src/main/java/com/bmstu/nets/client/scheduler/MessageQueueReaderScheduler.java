@@ -9,6 +9,7 @@ import com.bmstu.nets.client.statemachine.StateMachineHolder;
 import com.bmstu.nets.common.logger.Logger;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.bmstu.nets.client.statemachine.Event.CONNECT;
@@ -43,8 +44,10 @@ public class MessageQueueReaderScheduler
                         .forEach(domain -> {
                             final List<Message> messages = messageQueueMap.getAllForDomain(domain);
 
-                            logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
-                            sendMessages(domain, messages);
+                            if (!messages.isEmpty()) {
+                                logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
+                                sendMessages(domain, messages);
+                            }
                         });
 
                 sleep(DELAY_MILLIS);
@@ -64,12 +67,14 @@ public class MessageQueueReaderScheduler
         final List<String> mxRecords = getMxRecords(domain);
         if (mxRecords.isEmpty()) {
             logger.warn("No MX records found for domain '{}'", domain);
+            return;
         }
+
         final StateMachineContextHolder contextHolder = new StateMachineContextHolder()
                 .setSelector(channelsContext.getSelector())
                 .setNextEvent(CONNECT)
                 .setMxRecord(mxRecords.get(0))
-                .setMessage(messages.get(0));
+                .setMessages(new LinkedList<>(messages));
 
         stateMachine.raise(CONNECT, ANY, contextHolder);
     }
