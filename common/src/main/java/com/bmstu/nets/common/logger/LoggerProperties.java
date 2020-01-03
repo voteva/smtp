@@ -8,7 +8,4 @@ class LoggerProperties {
 
     @SerializedName("logger.level")
     private LogLevel level = LogLevel.INFO;
-
-    @SerializedName("logger.file-path")
-    private String filePath;
 }

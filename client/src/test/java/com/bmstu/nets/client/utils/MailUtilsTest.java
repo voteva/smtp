@@ -21,7 +21,7 @@ public class MailUtilsTest {
     }
 
     @Test
-    public void testGetMxRecords() throws Exception {
+    public void testGetMxRecords() {
         List<String> mailHosts = getMxRecords("google.com");
 
         assertNotNull(mailHosts);

@@ -17,7 +17,6 @@ public class LogWriter
         System.out.println("LogWriter thread started");
 
         while (!stopped) {
-            // TODO read log message and write to file
             String logMessage = logQueue.dequeue();
             if (logMessage != null) {
                 System.out.println(logMessage);
