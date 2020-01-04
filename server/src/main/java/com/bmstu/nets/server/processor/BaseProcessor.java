@@ -1,6 +1,7 @@
 package com.bmstu.nets.server.processor;
 
-import com.bmstu.nets.server.logger.Logger;
+import com.bmstu.nets.common.logger.Logger;
+import com.bmstu.nets.server.Server;
 import com.bmstu.nets.server.model.ServerMessage;
 
 import java.io.IOException;
@@ -8,10 +9,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
+import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
+
 public class BaseProcessor {
     protected static HashMap<SocketChannel, Boolean> mailDataMode = new HashMap<>();
     protected static HashMap<SocketChannel, ByteBuffer> map  = new HashMap<>();
-    protected static final Logger LOG = new Logger();
+    protected static final Logger LOG = getLogger(BaseProcessor.class);
 
     public static boolean process(SocketChannel sc, ByteBuffer data, ArrayList<ServerMessage> msgs) throws IOException {
         if (mailDataMode.get(sc)) {

@@ -1,11 +1,16 @@
 package com.bmstu.nets.server.processor;
 
+import com.bmstu.nets.common.logger.Logger;
+import com.bmstu.nets.server.Server;
 import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.msg.Parser;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+
+import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class CommandProcessor extends BaseProcessor{
     public static boolean process(SocketChannel sc, ArrayList<ServerMessage> msgs) throws IOException {
@@ -23,6 +28,11 @@ public class CommandProcessor extends BaseProcessor{
             resp(sc, "250 2.1.0 Ok\r\n");
 
         } else if (cmd.startsWith("RCPT TO:")) {
+            if (msgs.isEmpty() || isEmpty(msgs.get(msgs.size() - 1).getSender())) {
+                resp(sc, "503 5.5.1 Error: need MAIL command\r\n");
+                return true;
+            }
+
             msgs.get(msgs.size() - 1).addRecipient(Parser.parseRecipient(cmd));
             resp(sc, "250 2.1.0 Ok\r\n");
 
@@ -34,6 +44,11 @@ public class CommandProcessor extends BaseProcessor{
             resp(sc, "550 5.1.1 All recipients address rejected: User unknown in local recipient table\r\n");
 
         } else if (cmd.startsWith("DATA")) {
+            if (msgs.isEmpty() || msgs.get(msgs.size() - 1).getRecipients().isEmpty()) {
+                resp(sc, "503 5.5.1 Error: need RCPT command\r\n");
+                return true;
+            }
+
             resp(sc, "354 Terminate with line containing only '.' \r\n");
             mailDataMode.put(sc, Boolean.TRUE);
 

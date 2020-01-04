@@ -87,8 +87,7 @@ public class MessageReaderServiceImpl
                         properties.getMaildirPathCur()) + "/" + messagePath.getFileName();
 
         if (messagePath.toFile().renameTo(new File(newFileName))) {
-            boolean deleted = messagePath.toFile().delete();
-            logger.debug("Message '{}' deleted: {}", messagePath, deleted);
+            logger.debug("Message '{}' moved to cur", messagePath);
         } else {
             logger.warn("Failed to rename file '{}'", messagePath.getFileName());
         }
@@ -108,10 +107,10 @@ public class MessageReaderServiceImpl
 
     @Nonnull
     private Map<String, String> getHeaders(@Nonnull String data) {
-        final String headersStr = data.split("\n\n")[0];
+        final String headersStr = data.split("\r\n\r\n")[0];
         final Map<String, String> headers = newHashMap();
 
-        Arrays.stream(headersStr.split("\n"))
+        Arrays.stream(headersStr.split("\r\n"))
                 .forEach(it -> {
                     String[] splitHeader = it.split(":");
                     headers.put(splitHeader[0], splitHeader[1].replaceAll(" ", ""));

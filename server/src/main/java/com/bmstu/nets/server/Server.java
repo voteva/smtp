@@ -5,7 +5,7 @@
  */
 package com.bmstu.nets.server;
 
-import com.bmstu.nets.server.logger.Logger;
+import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.processor.BaseProcessor;
 import com.bmstu.nets.server.processor.ConnectProcessor;
@@ -23,14 +23,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
 
+import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
+
 /**
  *
  * @author patutinaam
  */
-public class Server {
+public class Server implements Runnable, AutoCloseable{
 
     private final int port;
-    private static final Logger LOG = new Logger();
+    private static final Logger LOG = getLogger(Server.class);
     private ServerSocketChannel ssc;
     private boolean stop = false;
     
@@ -43,13 +45,15 @@ public class Server {
     {
             this.port = port;
     }
-    
-    public void stop() throws Exception{
+
+    @Override
+    public void close() throws Exception {
         ssc.socket().close();
         stop = true;
     }
-        
-    public void startSMTP() {
+
+    @Override
+    public void run() {
         try {
             LOG.info("Starting SMTP  (▀̿̿Ĺ̯̿▀̿ ̿)");
             InetSocketAddress bindAddress = new InetSocketAddress(port);
@@ -117,7 +121,7 @@ public class Server {
             messagesHash.put(sk, new ArrayList<>());
         }
         ArrayList<ServerMessage> msgs = messagesHash.get(sk);
-        ByteBuffer buffer = ByteBuffer.allocate(1024); // TODO: 1024 is ok?
+        ByteBuffer buffer = ByteBuffer.allocate(1024); // TODO: more 1024
         boolean is_ok = true;
         while (is_ok && sc.read(buffer) > 0) {
             if(!BaseProcessor.process(sc, buffer, msgs)) {
@@ -153,19 +157,4 @@ public class Server {
             ex.printStackTrace();
         }
     }
-
-   public static void main(String[] args) {
-           int bindPort = 2525;
-           if(args.length == 1)
-           {
-                   LOG.info("Setting port to " + args[0]);
-                   bindPort = Integer.parseInt(args[0]);
-           }
-           else
-           {
-                   LOG.info("Default to 2525 (︶^︶)");
-           }
-           Server console = new Server(bindPort);
-           console.startSMTP();
-   }
 }
