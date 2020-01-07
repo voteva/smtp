@@ -3,20 +3,23 @@ package com.bmstu.nets.client.utils;
 import com.bmstu.nets.common.logger.Logger;
 
 import javax.annotation.Nonnull;
-import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.sort;
 import static java.util.Collections.singletonList;
 
 public class MailUtils {
     private static final Logger logger = getLogger(MailUtils.class);
+
+    private static final String DNS_PREFIX = "dns:/";
+    private static final String MX_ATTR = "MX";
+    private static final String DEFAULT_HOST = "localhost";
 
     @Nonnull
     public static String getDomainName(@Nonnull String mailAddress) {
@@ -28,8 +31,8 @@ public class MailUtils {
         try {
             final InitialDirContext iDirC = new InitialDirContext();
 
-            final Attributes attributes = iDirC.getAttributes("dns:/" + domainName, new String[]{"MX"});
-            final Attribute attributeMX = attributes.get("MX");
+            final Attributes attributes = iDirC.getAttributes(DNS_PREFIX + domainName, new String[]{MX_ATTR});
+            final Attribute attributeMX = attributes.get(MX_ATTR);
 
             if (attributeMX == null) {
                 return (singletonList(domainName));
@@ -40,7 +43,7 @@ public class MailUtils {
                 preferenceValuesHostNames[i] = ("" + attributeMX.get(i)).split("\\s+");
             }
 
-            Arrays.sort(preferenceValuesHostNames, Comparator.comparingInt(o -> Integer.parseInt(o[0])));
+            sort(preferenceValuesHostNames, Comparator.comparingInt(o -> Integer.parseInt(o[0])));
 
             final String[] sortedHostNames = new String[preferenceValuesHostNames.length];
             for (int i = 0; i < preferenceValuesHostNames.length; i++) {
@@ -49,11 +52,11 @@ public class MailUtils {
                         : preferenceValuesHostNames[i][1];
             }
 
-            return Arrays.asList(sortedHostNames);
+            return asList(sortedHostNames);
 
-        } catch (NamingException e) {
-            logger.error(e.getMessage());
-            return newArrayList();
+        } catch (Exception e) {
+            logger.error("Failed to get MX records. {}", e.getMessage());
+            return singletonList(DEFAULT_HOST);
         }
     }
 }

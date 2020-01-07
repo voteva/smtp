@@ -25,8 +25,7 @@ public class DataRequestReadAction
             int status = readFromChannel(contextHolder.getSelectionKey());
 
             if (status != 354) {
-                logger.error("Failed to say DATA to '{}', status {}",
-                        contextHolder.getMxRecord(), status);
+                logger.error("Failed to say DATA to '{}', status {}", contextHolder.getMxRecord(), status);
                 context.raise(FINALIZE, ANY);
                 return;
             }

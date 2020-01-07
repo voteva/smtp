@@ -25,8 +25,7 @@ public class MailFromReadAction
             int status = readFromChannel(contextHolder.getSelectionKey());
 
             if (status != 250) {
-                logger.error("Failed to say MAIL FROM  to '{}', status {}",
-                        contextHolder.getMxRecord(), status);
+                logger.error("Failed to say MAIL FROM  to '{}', status {}", contextHolder.getMxRecord(), status);
                 context.raise(FINALIZE, ANY);
                 return;
             }

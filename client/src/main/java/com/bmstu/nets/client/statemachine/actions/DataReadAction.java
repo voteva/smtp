@@ -26,8 +26,7 @@ public class DataReadAction
             int status = readFromChannel(contextHolder.getSelectionKey());
 
             if (status != 250) {
-                logger.error("Data content rejected for '{}', status {}",
-                        contextHolder.getMxRecord(), status);
+                logger.error("Data content rejected for '{}', status {}", contextHolder.getMxRecord(), status);
                 context.raise(FINALIZE, ANY);
                 return;
             }

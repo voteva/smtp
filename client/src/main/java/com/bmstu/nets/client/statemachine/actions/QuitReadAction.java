@@ -24,8 +24,7 @@ public class QuitReadAction
             int status = readFromChannel(contextHolder.getSelectionKey());
 
             if (status != 221) {
-                logger.error("Failed to QUIT  from '{}', status {}",
-                        contextHolder.getMxRecord(), status);
+                logger.error("Failed to QUIT  from '{}', status {}", contextHolder.getMxRecord(), status);
                 context.raise(FINALIZE, ANY);
                 return;
             }

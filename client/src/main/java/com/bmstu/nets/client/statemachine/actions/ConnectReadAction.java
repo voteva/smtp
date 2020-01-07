@@ -25,8 +25,7 @@ class ConnectReadAction
             int status = readFromChannel(contextHolder.getSelectionKey());
 
             if (status != 220) {
-                logger.error("Failed to connect to MX server '{}', status '{}'",
-                        contextHolder.getMxRecord(), status);
+                logger.error("Failed to connect to MX server '{}', status '{}'", contextHolder.getMxRecord(), status);
                 context.raise(FINALIZE, ANY);
                 return;
             }

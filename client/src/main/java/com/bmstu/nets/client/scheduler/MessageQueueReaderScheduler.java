@@ -9,13 +9,13 @@ import com.bmstu.nets.client.statemachine.StateMachineHolder;
 import com.bmstu.nets.common.logger.Logger;
 
 import javax.annotation.Nonnull;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.bmstu.nets.client.statemachine.Event.CONNECT;
 import static com.bmstu.nets.client.statemachine.Mode.ANY;
 import static com.bmstu.nets.client.utils.MailUtils.getMxRecords;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
+import static com.google.common.collect.Lists.newLinkedList;
 import static java.lang.Thread.sleep;
 
 public class MessageQueueReaderScheduler
@@ -80,7 +80,7 @@ public class MessageQueueReaderScheduler
                 .setNextEvent(CONNECT)
                 .setDomain(domain)
                 .setMxRecord(mxRecords.get(0))
-                .setMessages(new LinkedList<>(messages));
+                .setMessages(newLinkedList(messages));
 
         stateMachine.raise(CONNECT, ANY, contextHolder);
     }
