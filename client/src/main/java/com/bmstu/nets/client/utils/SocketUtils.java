@@ -16,20 +16,24 @@ import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
 public class SocketUtils {
     private static final Logger logger = getLogger(SocketUtils.class);
+    private static final int BUFFER_SIZE = 1024;
 
     @SneakyThrows(IOException.class)
     public static void writeToChannel(@Nonnull SelectionKey key, @Nonnull String data) {
-        ByteBuffer buffer = ByteBuffer.allocate(32000).order(ByteOrder.LITTLE_ENDIAN); // TODO
+
+        data = data.endsWith("\r\n") ? data : data + "\r\n";
+        ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+
         try {
             WritableByteChannel channel = (WritableByteChannel) key.channel();
 
-            data = data.endsWith("\r\n") ? data : data + "\r\n";
-
-            byte[] bytes = data.getBytes();
-            channel.write(ByteBuffer.wrap(bytes));
+            while (buffer.remaining() != 0) {
+                channel.write(buffer);
+            }
 
             key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+
         } finally {
             buffer.clear();
         }
@@ -37,24 +41,22 @@ public class SocketUtils {
 
     @SneakyThrows(IOException.class)
     public static int readFromChannel(@Nonnull SelectionKey key) {
-        ByteBuffer buffer = ByteBuffer.allocate(32000).order(ByteOrder.LITTLE_ENDIAN); // TODO
+        final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE).order(ByteOrder.LITTLE_ENDIAN);
         try {
             ReadableByteChannel channel = (ReadableByteChannel) key.channel();
+            final StringBuilder response = new StringBuilder();
 
-            int result = channel.read(buffer);
-            if (result <= 0) {
-                return -1;
+            while (channel.read(buffer) != 0) {
+                buffer.flip();
+                response.append(new String(buffer.array(), 0, buffer.limit(), StandardCharsets.US_ASCII));
             }
 
-            buffer.flip();
-
-            final String response = new String(buffer.array(), StandardCharsets.US_ASCII);
-            logger.debug(response);
+            logger.debug(response.toString());
 
             key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
             key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
 
-            return getResponseCode(response);
+            return getResponseCode(response.toString());
 
         } finally {
             buffer.clear();

@@ -107,10 +107,10 @@ public class MessageReaderServiceImpl
 
     @Nonnull
     private Map<String, String> getHeaders(@Nonnull String data) {
-        final String headersStr = data.split("\r\n\r\n")[0];
+        final String headersStr = data.split("\n\n")[0];
         final Map<String, String> headers = newHashMap();
 
-        Arrays.stream(headersStr.split("\r\n"))
+        Arrays.stream(headersStr.split("\n"))
                 .forEach(it -> {
                     String[] splitHeader = it.split(":");
                     headers.put(splitHeader[0], splitHeader[1].replaceAll(" ", ""));
