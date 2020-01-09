@@ -70,8 +70,6 @@ public class MessageSenderService
             socketChannel.finishConnect();
 
             if (socketChannel.isConnected()) {
-                Thread.sleep(1000);
-
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
 
                 StateMachineContext context = (StateMachineContext) key.attachment();

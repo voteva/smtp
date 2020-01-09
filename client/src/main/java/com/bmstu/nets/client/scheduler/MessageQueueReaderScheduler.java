@@ -47,7 +47,7 @@ public class MessageQueueReaderScheduler
                                 final List<Message> messages = messageQueueMap.getAllForDomain(domain);
 
                                 if (!messages.isEmpty()) {
-                                    logger.debug("Trying to send '{}' messages for domain '{}'", messages.size(), domain);
+                                    logger.debug("Retrieve '{}' messages from queue for domain '{}'", messages.size(), domain);
 
                                     channelsContext.setChannelNotReady(domain);
                                     sendMessages(domain, messages);

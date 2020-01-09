@@ -29,6 +29,8 @@ public class MailUtils {
     @Nonnull
     public static List<String> getMxRecords(@Nonnull String domainName) {
         try {
+            logger.debug("Trying to get MX records for domain '{}'", domainName);
+
             final InitialDirContext iDirC = new InitialDirContext();
 
             final Attributes attributes = iDirC.getAttributes(DNS_PREFIX + domainName, new String[]{MX_ATTR});
