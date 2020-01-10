@@ -19,13 +19,15 @@ public class MailDataProcessor extends BaseProcessor{
 
         boolean end = mail.endsWith("\r\n.\r\n");
         LOG.info("Message : " + mail + ", endsWith'.' : " + end);
+        msgs.get(msgs.size() - 1).setData(mail);
 
         if (end) {
-            msgs.get(msgs.size() - 1).setData(mail);
-            MessageSaver.save(msgs.get(msgs.size() - 1));
+            msgs.get(msgs.size() - 1).to_new();
             mailDataMode.put(sc, Boolean.FALSE);// back to command mode
             prev.clear();
             resp(sc, "250 2.0.0 Ok: got it {messageId}");
+        } else {
+            msgs.get(msgs.size() - 1).save();
         }
         return true;
     }

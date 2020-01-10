@@ -18,11 +18,10 @@ public class ServerMessage extends Message {
     }
 
     public boolean to_new() {
-//        boolean delete = new File(this.getDir()).delete();
-//        if (!delete) {
-//            LOG.info("Warning!!! Can't delete file" + this.getDir());
-//            return false;
-//        }
+        boolean delete = new File(this.getDir()).delete();
+        if (!delete) {
+            LOG.info("Warning!!! Can't delete file" + this.getDir());
+        }
         this.status = MessageStatus.NEW;
         return save();
     }

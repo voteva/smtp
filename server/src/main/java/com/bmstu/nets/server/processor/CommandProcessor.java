@@ -1,6 +1,7 @@
 package com.bmstu.nets.server.processor;
 
 import com.bmstu.nets.common.logger.Logger;
+import com.bmstu.nets.common.model.MessageStatus;
 import com.bmstu.nets.server.Server;
 import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.msg.Parser;
@@ -12,8 +13,8 @@ import java.util.ArrayList;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-public class CommandProcessor extends BaseProcessor{
-    public static boolean process(SocketChannel sc, ArrayList<ServerMessage> msgs) throws IOException {
+class CommandProcessor extends BaseProcessor{
+    static boolean process(SocketChannel sc, ArrayList<ServerMessage> msgs) throws IOException {
         String cmd = new String(map.get(sc).array(), 0, map.get(sc).position());
         LOG.info("command : " + cmd);
 
@@ -37,7 +38,11 @@ public class CommandProcessor extends BaseProcessor{
             resp(sc, "250 2.1.0 Ok\r\n");
 
         } else if (cmd.startsWith("RSET")) {
-            msgs.clear();
+            for (ServerMessage msg : msgs) {
+                if (msg.getStatus() == MessageStatus.TMP) {
+                    msgs.remove(msg);
+                }
+            }
             resp(sc, "250 2.0.0 Ok\r\n");
 
         } else if (cmd.startsWith("VRFY")) {
@@ -53,9 +58,6 @@ public class CommandProcessor extends BaseProcessor{
             mailDataMode.put(sc, Boolean.TRUE);
 
         } else if (cmd.startsWith("QUIT")) {
-            for (ServerMessage msg : msgs) {
-                msg.to_new();
-            }
             resp(sc, "221 Bye !\r\n");
             map.remove(sc);
             mailDataMode.remove(sc);

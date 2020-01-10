@@ -41,7 +41,7 @@ public class Server implements Runnable, AutoCloseable{
     private HashMap<SelectionKey, ArrayList<ServerMessage>> messagesHash  = new HashMap<>();
 
 
-    public Server(int port)
+    Server(int port)
     {
             this.port = port;
     }
@@ -69,7 +69,7 @@ public class Server implements Runnable, AutoCloseable{
             Executors.newSingleThreadExecutor().submit(() -> {
                 try {
                     while (!stop) {
-                        LOG.info("Connect me ('・ω・')");
+//                        LOG.info("Connect me ('・ω・')");
                         if (acpt_sel.select() <= 0) {
                             LOG.info("Nothing happend (-_-;)");
                             continue;
