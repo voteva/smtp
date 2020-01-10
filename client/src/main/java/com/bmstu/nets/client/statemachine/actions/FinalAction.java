@@ -6,6 +6,7 @@ import com.bmstu.nets.client.statemachine.StateMachineContext;
 import com.bmstu.nets.client.statemachine.StateMachineContextHolder;
 import com.bmstu.nets.common.logger.Logger;
 
+import static com.bmstu.nets.client.utils.SocketUtils.writeToChannel;
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
 public class FinalAction
@@ -18,6 +19,8 @@ public class FinalAction
             final StateMachineContextHolder contextHolder = context.getContextHolder();
 
             logger.debug("Execute FINALIZE action for '{}'", contextHolder.getMxRecord());
+
+            writeToChannel(contextHolder.getSelectionKey(), "RSET");
 
             contextHolder.getSelectionKey().cancel();
             contextHolder.getSelectionKey().channel().close();

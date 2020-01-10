@@ -65,8 +65,17 @@ public class MessageReaderServiceImpl
         try {
             final String messageData = new String(Files.readAllBytes(Paths.get(messagePath.toString())));
             final Map<String, String> headers = getHeaders(messageData);
-            final String originalFrom = headers.get(HEADER_X_ORIGINAL_FROM);
-            final String[] originalToArray = headers.get(HEADER_X_ORIGINAL_TO).split(",");
+
+            final String originalFrom = headers
+                    .get(HEADER_X_ORIGINAL_FROM)
+                    .replace("<", "")
+                    .replace(">", "");
+
+            final String[] originalToArray = headers
+                    .get(HEADER_X_ORIGINAL_TO)
+                    .replace("<", "")
+                    .replace(">", "")
+                    .split(",");
 
             return Arrays
                     .stream(originalToArray)
