@@ -29,12 +29,12 @@ class ConnectAction
             SocketChannel channel = SocketChannel.open();
             channel.configureBlocking(false);
 
+            logger.debug("Trying to connect to '{}'...", contextHolder.getMxRecord());
+            channel.connect(new InetSocketAddress(contextHolder.getMxRecord(), DEFAULT_SOCKET_PORT));
+
             SelectionKey selectionKey = channel.register(contextHolder.getSelector(), SelectionKey.OP_CONNECT);
             selectionKey.attach(context);
             contextHolder.setSelectionKey(selectionKey);
-
-            logger.debug("Trying to connect to '{}'...", contextHolder.getMxRecord());
-            channel.connect(new InetSocketAddress(contextHolder.getMxRecord(), DEFAULT_SOCKET_PORT));
 
         } catch (Exception e) {
             logger.error(e.getMessage());

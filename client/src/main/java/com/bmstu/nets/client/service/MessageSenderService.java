@@ -71,6 +71,7 @@ public class MessageSenderService
 
             if (socketChannel.isConnected()) {
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+                Thread.sleep(1000);
 
                 StateMachineContext context = (StateMachineContext) key.attachment();
                 context.raise(CONNECT, READ);

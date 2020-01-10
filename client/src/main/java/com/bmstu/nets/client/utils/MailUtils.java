@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static java.util.Collections.singletonList;
@@ -19,7 +20,6 @@ public class MailUtils {
 
     private static final String DNS_PREFIX = "dns:/";
     private static final String MX_ATTR = "MX";
-    private static final String DEFAULT_HOST = "localhost";
 
     @Nonnull
     public static String getDomainName(@Nonnull String mailAddress) {
@@ -58,7 +58,7 @@ public class MailUtils {
 
         } catch (Exception e) {
             logger.error("Failed to get MX records. {}", e.getMessage());
-            return singletonList(DEFAULT_HOST);
+            return newArrayList();
         }
     }
 }
