@@ -51,6 +51,7 @@ public class MessageReaderServiceImpl
                 logger.debug("Success to read messages from '{}'. Total messages count={}",
                         properties.getMaildirBasePath(), messages.size());
             }
+
             return messages;
 
         } catch (Exception e) {

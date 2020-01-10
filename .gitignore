@@ -37,3 +37,4 @@ infra/Dockerfile.made
 files/
 old/
 Maildir/
+MaildirTest/
