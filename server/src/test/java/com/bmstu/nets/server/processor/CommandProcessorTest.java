@@ -27,7 +27,7 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class CommandProcessorTest {
         bb.position(4);
         map.put(sc, bb);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertTrue(process(sc, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 
     @Test
@@ -110,6 +110,6 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertFalse(process(sc, new ArrayList<>()));
+        assertFalse(process(sc, null, new ArrayList<>()));
     }
 }

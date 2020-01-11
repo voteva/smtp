@@ -20,22 +20,13 @@ public class BaseProcessor {
             // data mode
             LOG.info("now in data mode");
             MailDataProcessor.process(sc, data, msgs);
+
             return true;
         } else {
             // command mode
             LOG.info("now in command mode");
-            ByteBuffer prev = map.get(sc);
-            if (data != null) {
-                prev.put((ByteBuffer) data.flip());
-            }
 
-            String txt = new String(prev.array(), 0, prev.position());
-            if (!txt.contains("\r\n")) {
-                return true;// client not yet finished command
-            }
-            boolean is_ok = CommandProcessor.process(sc, msgs);
-            prev.clear();// start over for next request.
-            return is_ok;
+            return CommandProcessor.process(sc, data, msgs);
         }
     }
 

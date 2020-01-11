@@ -27,7 +27,7 @@ public class MailDataProcessor extends BaseProcessor{
             prev.clear();
             resp(sc, "250 2.0.0 Ok: got it {messageId}");
         } else {
-            msgs.get(msgs.size() - 1).save();
+//            msgs.get(msgs.size() - 1).save();
         }
         return true;
     }

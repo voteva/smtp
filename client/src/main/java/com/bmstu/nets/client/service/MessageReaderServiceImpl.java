@@ -117,7 +117,8 @@ public class MessageReaderServiceImpl
 
     @Nonnull
     private Map<String, String> getHeaders(@Nonnull String data) {
-        final String headersStr = data.split("\r\n\r\n")[0];
+        String headersStr = data.split("\r\n\r\n")[0];
+        headersStr = headersStr.replaceAll("\r\n\t", " ");
         final Map<String, String> headers = newHashMap();
 
         Arrays.stream(headersStr.split("\r\n"))

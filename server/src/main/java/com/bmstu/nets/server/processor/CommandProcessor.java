@@ -5,13 +5,24 @@ import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.msg.Parser;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 class CommandProcessor extends BaseProcessor{
-    static boolean process(SocketChannel sc, ArrayList<ServerMessage> msgs) throws IOException {
+    public static boolean process(SocketChannel sc, ByteBuffer data, ArrayList<ServerMessage> msgs) throws IOException {
+        ByteBuffer prev = map.get(sc);
+        if (data != null) {
+            prev.put((ByteBuffer) data.flip());
+        }
+
+        String txt = new String(prev.array(), 0, prev.position());
+        if (!txt.contains("\r\n")) {
+            return true;// client not yet finished command
+        }
+
         String cmd = new String(map.get(sc).array(), 0, map.get(sc).position());
         LOG.info("command : " + cmd);
 
@@ -31,6 +42,7 @@ class CommandProcessor extends BaseProcessor{
         } else if (cmd.startsWith("RCPT TO:")) {
             if (msgs.isEmpty() || isEmpty(msgs.get(msgs.size() - 1).getSender())) {
                 resp(sc, "503 5.5.1 Error: need MAIL command\r\n");
+                prev.clear();
                 return true;
             }
 
@@ -51,6 +63,7 @@ class CommandProcessor extends BaseProcessor{
         } else if (cmd.startsWith("DATA")) {
             if (msgs.isEmpty() || msgs.get(msgs.size() - 1).getRecipients().isEmpty()) {
                 resp(sc, "503 5.5.1 Error: need RCPT command\r\n");
+                prev.clear();
                 return true;
             }
 
@@ -61,12 +74,15 @@ class CommandProcessor extends BaseProcessor{
             resp(sc, "221 Bye !\r\n");
             map.remove(sc);
             mailDataMode.remove(sc);
+            prev.clear();
             return false;
 
         } else {
             resp(sc, "502 5.5.2 Error: command not recognized\r\n");
             LOG.info("Warning!!! Unknown command : " + cmd);
         }
+
+        prev.clear();
         return true;
     }
 }
