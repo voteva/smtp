@@ -46,4 +46,11 @@ public class BaseProcessor {
         sc.write(ByteBuffer.wrap(bytes));
     }
 
+    public static void setMap(HashMap<SocketChannel, ByteBuffer> map) {
+        BaseProcessor.map = map;
+    }
+
+    static void setMailDataMode(HashMap<SocketChannel, Boolean> mailDataMode) {
+        BaseProcessor.mailDataMode = mailDataMode;
+    }
 }
