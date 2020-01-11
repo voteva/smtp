@@ -10,10 +10,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-class StartupService {
+public class StartupService {
     private final ExecutorService executorService;
 
-    StartupService() {
+    public StartupService() {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("Service-%d")
                 .setDaemon(true)
@@ -21,10 +21,14 @@ class StartupService {
         this.executorService = Executors.newFixedThreadPool(4, threadFactory);
     }
 
-    void start() {
+    public void start() {
         executorService.execute(new LogWriter());
         executorService.execute(new MessageSenderService());
         executorService.execute(new MessageQueueReaderScheduler());
         executorService.execute(new MessageFileReaderScheduler());
+    }
+
+    public void stop() {
+        executorService.shutdownNow();
     }
 }

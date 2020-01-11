@@ -1,0 +1,25 @@
+digraph test {
+rankdir=LR;
+ranksep=0.1; nodesep=0.1; defaultdist = 0.1; len = 0.1;
+"SS INIT" -> "SS WAIT" [label="handle HELO"];
+"SS MAIL SET" -> "SS WAIT" [label="handle RSET"];
+"SS WAIT" -> "SS CLOSED" [label="handle QUIT"];
+"SS WRITING DATA" -> "SS DELIVERING" [label="CLRF dot CLRF"];
+"SS MAIL SET" -> "SS RECEPIENTS SET" [label="handle RCPT"];
+"SS DELIVERING" -> "SS WAIT" [label="message saved"];
+"SS RECEPIENTS SET" -> "SS RECEPIENTS SET" [label="handle RCPT"];
+"SS WAIT" -> "SS MAIL SET" [label="handle MAIL"];
+"SS WRITING DATA" -> "SS WRITING DATA" [label="text"];
+"SS RECEPIENTS SET" -> "SS WRITING DATA" [label="handle DATA"];
+"SS INIT" -> "SS CLOSED" [label="handle QUIT"];
+"SS WAIT" -> "SS CLOSED" [label="connection failed"];
+"SS MAIL SET" -> "SS CLOSED" [label="handle QUIT"];
+"SS RECEPIENTS SET" -> "SS WAIT" [label="handle RSET"];
+"SS WRITING DATA" -> "SS CLOSED" [label="connection failed"];
+"SS RECEPIENTS SET" -> "SS CLOSED" [label="connection failed"];
+"SS WAIT" -> "SS WAIT" [label="handle RSET"];
+"SS MAIL SET" -> "SS CLOSED" [label="connection failed"];
+"'*'" -> "SS INIT" [label="connection established"];
+"SS INIT" -> "SS CLOSED" [label="connection failed"];
+"SS RECEPIENTS SET" -> "SS CLOSED" [label="handle QUIT"];
+}
