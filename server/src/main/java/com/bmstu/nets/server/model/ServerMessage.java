@@ -3,7 +3,6 @@ package com.bmstu.nets.server.model;
 import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.common.model.Message;
 import com.bmstu.nets.common.model.MessageStatus;
-import com.bmstu.nets.server.Server;
 import com.bmstu.nets.server.msg.MessageSaver;
 
 import java.io.File;

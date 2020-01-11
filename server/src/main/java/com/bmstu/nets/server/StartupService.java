@@ -20,6 +20,6 @@ class StartupService {
 
     void start(int bindPort) {
         executorService.execute(new LogWriter());
-        executorService.execute(new Server(bindPort));
+        executorService.execute(new MessageReceiver(bindPort));
     }
 }

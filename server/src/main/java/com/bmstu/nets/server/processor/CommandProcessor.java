@@ -1,8 +1,6 @@
 package com.bmstu.nets.server.processor;
 
-import com.bmstu.nets.common.logger.Logger;
 import com.bmstu.nets.common.model.MessageStatus;
-import com.bmstu.nets.server.Server;
 import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.msg.Parser;
 
@@ -10,7 +8,6 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 class CommandProcessor extends BaseProcessor{
@@ -18,16 +15,19 @@ class CommandProcessor extends BaseProcessor{
         String cmd = new String(map.get(sc).array(), 0, map.get(sc).position());
         LOG.info("command : " + cmd);
 
+//        EHLO \w+
         if (cmd.startsWith("EHLO ")) {
             resp(sc, "250- SMTP at your service, [127.0.0.1]\r\n250-8BITMIME\r\n250-ENHANCEDSTATUSCODES\r\n250 STARTTLS\r\n");
 
+//        HELO \w+
         } else if (cmd.startsWith("HELO ")) {
             resp(sc, "250 localhost Hello SMTP\r\n");
-
+//      MAIL FROM: <\w+@\w+\.\w+>
         } else if (cmd.startsWith("MAIL FROM:")) {
             msgs.add((ServerMessage) new ServerMessage().setSender(Parser.parseSender(cmd)));
             resp(sc, "250 2.1.0 Ok\r\n");
 
+//            RCPT TO: <\w+@\w+\.\w+>
         } else if (cmd.startsWith("RCPT TO:")) {
             if (msgs.isEmpty() || isEmpty(msgs.get(msgs.size() - 1).getSender())) {
                 resp(sc, "503 5.5.1 Error: need MAIL command\r\n");
@@ -44,7 +44,7 @@ class CommandProcessor extends BaseProcessor{
                 }
             }
             resp(sc, "250 2.0.0 Ok\r\n");
-
+//      VRFY \w+
         } else if (cmd.startsWith("VRFY")) {
             resp(sc, "550 5.1.1 All recipients address rejected: User unknown in local recipient table\r\n");
 

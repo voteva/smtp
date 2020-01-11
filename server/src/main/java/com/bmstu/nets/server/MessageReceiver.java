@@ -29,10 +29,10 @@ import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
  *
  * @author patutinaam
  */
-public class Server implements Runnable, AutoCloseable{
+public class MessageReceiver implements Runnable, AutoCloseable{
 
     private final int port;
-    private static final Logger LOG = getLogger(Server.class);
+    private static final Logger LOG = getLogger(MessageReceiver.class);
     private ServerSocketChannel ssc;
     private boolean stop = false;
     
@@ -41,7 +41,7 @@ public class Server implements Runnable, AutoCloseable{
     private HashMap<SelectionKey, ArrayList<ServerMessage>> messagesHash  = new HashMap<>();
 
 
-    Server(int port)
+    MessageReceiver(int port)
     {
             this.port = port;
     }
@@ -94,7 +94,7 @@ public class Server implements Runnable, AutoCloseable{
                         }
                     }
 
-                    LOG.info("Server stoped (｡ŏ﹏ŏ)");
+                    LOG.info("MessageReceiver stoped (｡ŏ﹏ŏ)");
                     ssc.socket().close();
                 } catch (Exception e) {
                     LOG.error("Error!!! I catch exception!!! (T_T)\n" + e.toString());
