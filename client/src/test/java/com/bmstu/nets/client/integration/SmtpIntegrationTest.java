@@ -2,6 +2,7 @@ package com.bmstu.nets.client.integration;
 
 import com.bmstu.nets.client.StartupService;
 import com.bmstu.nets.client.helper.MailAuthenticator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
@@ -26,6 +27,7 @@ public class SmtpIntegrationTest {
     private static final String IMAP_AUTH_EMAIL = "iu7.test@yandex.ru";
     private static final String IMAP_AUTH_PWD = "aXU3LnRlc3RwYXNzd29yZA==";
 
+    @Ignore
     @Test
     public void sendMessage() {
         checkMessageSending();

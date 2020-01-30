@@ -110,6 +110,6 @@ public class CommandProcessorTest {
         map.put(sc, bb);
         setMap(map);
 
-        assertFalse(process(sc, null, new ArrayList<>()));
+        assertTrue(process(sc, null, new ArrayList<>()));
     }
 }

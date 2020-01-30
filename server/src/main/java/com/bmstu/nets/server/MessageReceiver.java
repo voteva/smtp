@@ -10,7 +10,9 @@ import com.bmstu.nets.server.model.ServerMessage;
 import com.bmstu.nets.server.processor.BaseProcessor;
 import com.bmstu.nets.server.processor.ConnectProcessor;
 import com.bmstu.nets.server.processor.EndProcessor;
+import lombok.SneakyThrows;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -21,29 +23,21 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.Executors;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
-/**
- *
- * @author patutinaam
- */
-public class MessageReceiver implements Runnable, AutoCloseable{
+public class MessageReceiver
+        implements Runnable, AutoCloseable {
+    private static final Logger logger = getLogger(MessageReceiver.class);
+
+    private final HashMap<SelectionKey, ArrayList<ServerMessage>> messagesHash = new HashMap<>();
 
     private final int port;
-    private static final Logger LOG = getLogger(MessageReceiver.class);
     private ServerSocketChannel ssc;
     private boolean stop = false;
-    
-    private HashMap<SocketChannel, Boolean>    mode = new HashMap<>();
-    private HashMap<SocketChannel, ByteBuffer> map  = new HashMap<>();
-    private HashMap<SelectionKey, ArrayList<ServerMessage>> messagesHash  = new HashMap<>();
 
-
-    MessageReceiver(int port)
-    {
-            this.port = port;
+    MessageReceiver(int port) {
+        this.port = port;
     }
 
     @Override
@@ -55,59 +49,55 @@ public class MessageReceiver implements Runnable, AutoCloseable{
     @Override
     public void run() {
         try {
-            LOG.info("Starting SMTP  (▀̿̿Ĺ̯̿▀̿ ̿)");
+            logger.info("Starting SMTP  (▀̿̿Ĺ̯̿▀̿ ̿)");
             InetSocketAddress bindAddress = new InetSocketAddress(port);
             ssc = ServerSocketChannel.open();
 
             ssc.configureBlocking(false);
             ssc.socket().bind(bindAddress);
 
-            final Selector acpt_sel = Selector.open();
-            ssc.register(acpt_sel, SelectionKey.OP_ACCEPT);
-            
-            LOG.info("I am OK! Listen you (ーー;)");
-            Executors.newSingleThreadExecutor().submit(() -> {
-                try {
-                    while (!stop) {
-//                        LOG.info("Connect me ('・ω・')");
-                        if (acpt_sel.select() <= 0) {
-                            LOG.info("Nothing happend (-_-;)");
-                            continue;
-                        }
-                        Iterator<SelectionKey> iter = acpt_sel.selectedKeys().iterator();
-                        while (iter.hasNext()) {
-                            SelectionKey sk = iter.next();
-                            iter.remove();
-                            if (!sk.isValid()) {
-                                LOG.error("Error!!! Invalid key!!! (T_T)");
-                                error(sk);
-                                return;
-                            } else if (sk.isAcceptable()) {
-                                accept(sk);
-                            } else if (sk.isReadable()) {
-                                read(sk);
-                            } else if (sk.isWritable()) {
-                                LOG.info("Warning!!! Write is not registry !!! (T_T)");
-                            } else {
-                                LOG.info("Warning!!! Unknown status !!! (T_T)");
-                            }
+            final Selector selector = Selector.open();
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+
+            logger.info("I am OK! Listen you (ーー;)");
+            try {
+                while (!stop) {
+                    if (selector.select() <= 0) {
+                        logger.info("Nothing happened (-_-;)");
+                        continue;
+                    }
+                    Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
+                    while (iter.hasNext()) {
+                        SelectionKey sk = iter.next();
+                        iter.remove();
+                        if (!sk.isValid()) {
+                            logger.error("Error!!! Invalid key!!! (T_T)");
+                            error(sk);
+                            return;
+                        } else if (sk.isAcceptable()) {
+                            accept(sk);
+                        } else if (sk.isReadable()) {
+                            read(sk);
+                        } else if (sk.isWritable()) {
+                            logger.info("Warning!!! Write is not registry !!! (T_T)");
+                        } else {
+                            logger.info("Warning!!! Unknown status !!! (T_T)");
                         }
                     }
-
-                    LOG.info("MessageReceiver stoped (｡ŏ﹏ŏ)");
-                    ssc.socket().close();
-                } catch (Exception e) {
-                    LOG.error("Error!!! I catch exception!!! (T_T)\n" + e.toString());
-                    notifyAllAboutError(acpt_sel);
-                    e.printStackTrace();
                 }
-            });
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);        
+
+                logger.info("MessageReceiver stopped (｡ŏ﹏ŏ)");
+                ssc.socket().close();
+            } catch (Exception e) {
+                logger.error("Error!!! I catch exception!!! (T_T)\n" + e.toString());
+                notifyAllAboutError(selector);
+            }
+        } catch (Exception ex) {
+            logger.error("", ex);
         }
     }
-    
-     private void accept(SelectionKey sk) throws Exception {
+
+    private void accept(@Nonnull SelectionKey sk) throws IOException {
         ServerSocketChannel ssc = (ServerSocketChannel) sk.channel();
         SocketChannel sc = ssc.accept();
         sc.configureBlocking(false);
@@ -115,16 +105,17 @@ public class MessageReceiver implements Runnable, AutoCloseable{
         ConnectProcessor.process(sc);
     }
 
-    private void read(SelectionKey sk) throws IOException {
+    private void read(@Nonnull SelectionKey sk) throws IOException {
         SocketChannel sc = (SocketChannel) sk.channel();
         if (!messagesHash.containsKey(sk)) {
             messagesHash.put(sk, new ArrayList<>());
         }
+
         ArrayList<ServerMessage> msgs = messagesHash.get(sk);
-        ByteBuffer buffer = ByteBuffer.allocate(1024); // TODO: more 1024
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
         boolean is_ok = true;
         while (is_ok && sc.read(buffer) > 0) {
-            if(!BaseProcessor.process(sc, buffer, msgs)) {
+            if (!BaseProcessor.process(sc, buffer, msgs)) {
                 is_ok = false;
                 sc.close();
             }
@@ -133,28 +124,24 @@ public class MessageReceiver implements Runnable, AutoCloseable{
         if (is_ok) sk.interestOps(SelectionKey.OP_READ);
     }
 
-    private void error(SelectionKey sk) throws Exception {
+    private void error(SelectionKey sk) throws IOException {
         SocketChannel sc = (SocketChannel) sk.channel();
         EndProcessor.process(sc);
     }
 
-
-    private void notifyAllAboutError(Selector acpt_sel) {
-        for (SelectionKey sk : acpt_sel.keys()) {
+    private void notifyAllAboutError(@Nonnull Selector selector) {
+        for (SelectionKey sk : selector.keys()) {
             SocketChannel sc = (SocketChannel) sk.channel();
             try {
                 EndProcessor.process(sc);
-//                sc.close();
-            } catch (IOException ex) {
-                LOG.error("Error!!! I catch exception while SocketChannel notify and close!!! (T_T)\n" + ex.toString());
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("Error!!! I catch exception while SocketChannel notify and close!!! (T_T)\n" + ex.toString());
             }
         }
         try {
             ssc.socket().close();
         } catch (IOException ex) {
-            LOG.error("Error!!! I catch exception while ServerSocketChannel close!!! (T_T)\n" + ex.toString());
-            ex.printStackTrace();
+            logger.error("Error!!! I catch exception while ServerSocketChannel close!!! (T_T)\n" + ex.toString());
         }
     }
 }

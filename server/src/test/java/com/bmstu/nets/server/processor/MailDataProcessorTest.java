@@ -1,7 +1,6 @@
 package com.bmstu.nets.server.processor;
 
 import com.bmstu.nets.server.model.ServerMessage;
-import com.bmstu.nets.server.msg.Parser;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -3,17 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bmstu.nets.server.msg;
+package com.bmstu.nets.server.helper;
 
-import com.bmstu.nets.common.model.Message;
-import java.nio.ByteBuffer;
-import java.util.regex.Pattern;
+public class MessageParser {
 
-/**
- *
- * @author patutinaam
- */
-public class Parser {
     public static String parseSender(String command) {
         return command.replace("MAIL FROM:","").replaceAll("\\s+","");
     }

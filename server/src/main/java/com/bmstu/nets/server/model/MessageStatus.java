@@ -1,4 +1,4 @@
-package com.bmstu.nets.common.model;
+package com.bmstu.nets.server.model;
 
 public enum MessageStatus {
     TMP,

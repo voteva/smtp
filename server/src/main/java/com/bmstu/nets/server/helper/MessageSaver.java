@@ -3,32 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bmstu.nets.server.msg;
+package com.bmstu.nets.server.helper;
 
 import com.bmstu.nets.common.logger.Logger;
-import com.bmstu.nets.common.model.Message;
+import com.bmstu.nets.server.model.Message;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 import static com.bmstu.nets.common.logger.LoggerFactory.getLogger;
 
-/**
- *
- * @author patutinaam
- */
 public class MessageSaver {
-    private static final Logger LOG = getLogger(MessageSaver.class);
+    private static final Logger logger = getLogger(MessageSaver.class);
 
     public static boolean save(Message msg) {
+        final String dirName = msg.getDir();
         try {
-            FileUtils.writeByteArrayToFile(new File(msg.getDir()), msg.getData());
+            FileUtils.writeByteArrayToFile(new File(dirName), msg.getData());
             return true;
-        } catch (IOException e) {
-            LOG.info("Warning!!! Can't save file" + msg.getDir());
+        } catch (Exception e) {
+            logger.warn("Failed to save file '{}'", dirName);
             return false;
         }
-
     }
 }

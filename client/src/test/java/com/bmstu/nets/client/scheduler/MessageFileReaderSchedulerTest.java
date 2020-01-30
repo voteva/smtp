@@ -2,6 +2,7 @@ package com.bmstu.nets.client.scheduler;
 
 import com.bmstu.nets.client.queue.MessageQueueMap;
 import lombok.SneakyThrows;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class MessageFileReaderSchedulerTest {
 
+    @Ignore
     @Test
     @SneakyThrows(InterruptedException.class)
     public void testRun() {
